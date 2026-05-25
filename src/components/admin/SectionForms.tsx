@@ -10,7 +10,7 @@ import {
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import SectionSaveFooter from "@/components/admin/SectionSaveFooter";
-import IconPicker from "./IconPicker";
+import IconPicker, { HOME_SERVICE_CARD_ICON_OPTIONS } from "./IconPicker";
 
 type SectionRow = {
   id: string;
@@ -416,6 +416,16 @@ export function ServicesSectionForm({
     formState: { errors, isSubmitting },
   } = useForm<ServicesFormValues>({ defaultValues });
   const { fields, append, remove } = useFieldArray({ control, name: "cards" });
+  const iconOptionLabels: Record<string, string> = {
+    shield: "Cybersecurity (shield)",
+    nodes: "Data & Cloud (network)",
+    terminal: "Software & Development (terminal)",
+    sync: "Consulting & Training (sync)",
+    security: "Security",
+    online: "Cloud / online",
+    innovation: "Innovation",
+    corporate: "Corporate",
+  };
 
   function handleValid(values: ServicesFormValues) {
     onSave({
@@ -508,13 +518,30 @@ export function ServicesSectionForm({
             </label>
             <label>
               Icon
-              <input
-                {...register(`cards.${index}.icon`, {
-                  required: "Icon is required",
-                })}
-                placeholder="security"
+              <Controller
+                control={control}
+                name={`cards.${index}.icon`}
+                rules={{ required: "Icon is required" }}
+                render={({ field }) => (
+                  <IconPicker
+                    value={typeof field.value === "string" ? field.value : ""}
+                    onChange={(val) => field.onChange(val)}
+                    options={HOME_SERVICE_CARD_ICON_OPTIONS}
+                  />
+                )}
               />
-              <FieldHint>Use icon key like security, online, innovation, corporate.</FieldHint>
+              <FieldHint>
+                Choose an icon:{" "}
+                {HOME_SERVICE_CARD_ICON_OPTIONS.map(
+                  (key) => iconOptionLabels[key] ?? key,
+                ).join(", ")}
+                .
+              </FieldHint>
+              {errors.cards?.[index]?.icon ? (
+                <p className="admin-field-error">
+                  {errors.cards[index]?.icon?.message}
+                </p>
+              ) : null}
             </label>
             <button
               type="button"
@@ -530,7 +557,7 @@ export function ServicesSectionForm({
           className="admin-button-secondary"
           onClick={() =>
             append({
-              icon: "spark",
+              icon: "security",
               title: "",
               description: "",
               category: "",

@@ -38,28 +38,48 @@ import {
   LineChart,
   Handshake,
   Phone,
+  RefreshCw,
   Search,
   Server,
   Settings,
   Star,
   Sparkles,
+  Terminal,
   Upload,
   Wifi,
   Wrench,
+  Waypoints,
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
 
+/** Icons used on the home services pillars and services page capability grid. */
+export const HOME_SERVICE_CARD_ICON_OPTIONS = [
+  "shield",
+  "nodes",
+  "terminal",
+  "sync",
+  "security",
+  "online",
+  "innovation",
+  "corporate",
+] as const;
+
 type Props = {
   value: unknown;
   onChange: (val: string) => void;
+  options?: readonly string[];
 };
 
-export default function IconPicker({ value, onChange }: Props) {
+export default function IconPicker({ value, onChange, options }: Props) {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const selectedValue = typeof value === "string" ? value : "";
   const ICON_OPTIONS: Array<{ name: string; Icon: LucideIcon }> = [
+    { name: "shield", Icon: Shield },
+    { name: "nodes", Icon: Waypoints },
+    { name: "terminal", Icon: Terminal },
+    { name: "sync", Icon: RefreshCw },
     { name: "security", Icon: Shield },
     { name: "online", Icon: Cloud },
     { name: "innovation", Icon: Code2 },
@@ -109,7 +129,13 @@ export default function IconPicker({ value, onChange }: Props) {
   ];
   const SelectedIcon = ICON_OPTIONS.find((opt) => opt.name === selectedValue)?.Icon;
 
-  const iconEntries = ICON_OPTIONS.filter((option) =>
+  const availableOptions = options?.length
+    ? options
+        .map((name) => ICON_OPTIONS.find((opt) => opt.name === name))
+        .filter((opt): opt is { name: string; Icon: LucideIcon } => Boolean(opt))
+    : ICON_OPTIONS;
+
+  const iconEntries = availableOptions.filter((option) =>
     option.name.toLowerCase().includes(search.toLowerCase()),
   );
 

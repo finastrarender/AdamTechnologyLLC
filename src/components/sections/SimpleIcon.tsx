@@ -16,7 +16,11 @@ type IconName =
   | "integrity"
   | "innovation"
   | "clientFocus"
-  | "compliance";
+  | "compliance"
+  | "shield"
+  | "nodes"
+  | "terminal"
+  | "sync";
 
 export default function SimpleIcon({
   name,
@@ -196,6 +200,64 @@ export default function SimpleIcon({
     fill="currentColor"
   />
 </svg>
+      );
+    case "shield":
+      return (
+        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 3 5 6v6c0 5 3 8.7 7 10 4-1.3 7-5 7-10V6l-7-3zm0 3.2L16 8v3c0 3.1-1.5 5.7-4 7-2.5-1.3-4-3.9-4-7V8l4-1.8z"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+          />
+        </svg>
+      );
+    case "nodes":
+      return (
+        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="5" cy="6" r="1.7" fill="currentColor" />
+          <circle cx="12" cy="4" r="1.7" fill="currentColor" />
+          <circle cx="19" cy="8" r="1.7" fill="currentColor" />
+          <circle cx="8" cy="14" r="1.7" fill="currentColor" />
+          <circle cx="16" cy="17" r="1.7" fill="currentColor" />
+          <path
+            d="M6.5 6.4 10.2 4.8M13.6 4.7 17.2 7.2M6.3 7.4 7.4 12.4M9.4 13.5l5.1 2.8M17.6 9.6l-1.2 5.8"
+            stroke="currentColor"
+            strokeWidth="1.2"
+            fill="none"
+          />
+        </svg>
+      );
+    case "terminal":
+      return (
+        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 6h16v12H4z" fill="none" stroke="currentColor" strokeWidth="1.6" />
+          <path
+            d="m8 10 2 2-2 2M12 14h4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+        </svg>
+      );
+    case "sync":
+      return (
+        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 4a8 8 0 1 0 8 8h-2.2a5.8 5.8 0 1 1-1.7-4.1l-2.1 2.1h6V4l-2.4 2.4A7.95 7.95 0 0 0 12 4z"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+          />
+          <path
+            d="M12 9v3.5l2.4 1.6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+        </svg>
       );
     default:
       return null;
