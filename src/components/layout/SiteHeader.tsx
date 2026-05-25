@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export type NavItem = { label: string; href: string; active?: boolean };
 
@@ -17,11 +17,21 @@ export default function SiteHeader({
   navItems: NavItem[];
 }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const applyParams = new URLSearchParams(searchParams.toString());
-  applyParams.set("apply", "1");
-  const applyHref = `${pathname}${applyParams.toString() ? `?${applyParams.toString()}` : ""}`;
+  const applyHref = `${pathname}?apply=1`;
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isMenuOpen]);
 
   const validNavItems = navItems.filter(
     (item): item is { label: string; href: string; active?: boolean } =>
@@ -52,17 +62,40 @@ export default function SiteHeader({
         </div>
 
         <button
-          className="menu-toggle"
+          className={`menu-toggle${isMenuOpen ? " is-open" : ""}`}
           type="button"
           aria-expanded={isMenuOpen}
           aria-controls="site-navigation"
           onClick={() => setIsMenuOpen((open) => !open)}
         >
-          <span className="menu-toggle__line"></span>
-          <span className="menu-toggle__line"></span>
-          <span className="menu-toggle__line"></span>
+          <span className="menu-toggle__icon" aria-hidden="true">
+            <span className="menu-toggle__line" />
+            <span className="menu-toggle__line" />
+            <span className="menu-toggle__line" />
+          </span>
           <span className="visually-hidden">Toggle navigation</span>
         </button>
+
+        <div className="site-header__actions">
+          <span className="header-badge">DUBAI LICENSED</span>
+          <Link
+            href={applyHref}
+            className="header-button"
+            aria-label="Inquire"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            INQUIRE
+          </Link>
+        </div>
+
+        {isMenuOpen ? (
+          <button
+            type="button"
+            className="site-nav-backdrop"
+            aria-label="Close menu"
+            onClick={() => setIsMenuOpen(false)}
+          />
+        ) : null}
 
         <nav
           className={`site-nav${isMenuOpen ? " is-open" : ""}`}
@@ -80,17 +113,11 @@ export default function SiteHeader({
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.label}
-                {active && (<span className="underline"></span>)}
+                {active && <span className="underline" />}
               </Link>
             );
           })}
         </nav>
-        <div className="site-header__actions">
-          <span className="header-badge">DUBAI LICENSED</span>
-          <Link href={applyHref} className="header-button" aria-label="Inquire">
-            INQUIRE
-          </Link>
-        </div>
       </div>
     </header>
   );
