@@ -11,6 +11,18 @@ export default function ContactInquirySection({ content }: { content: ContactInq
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "err">("idle");
   const [message, setMessage] = useState("");
   const formFields = content.formFields ?? {};
+  const heroEyebrow = content.heroEyebrow ?? "PROTOCOL: COMMUNICATION";
+  const heroTitleLines =
+    content.heroTitleLines && content.heroTitleLines.length > 0
+      ? content.heroTitleLines
+      : ["CONNECT", "SECURELY"];
+  const heroSideCopy =
+    content.heroSideCopy ??
+    "ENTERPRISE-GRADE COMMUNICATION NODES FOR INDUSTRIAL SCALING AND TECHNOLOGICAL SOVEREIGNTY.";
+  const mapImage = content.mapImage?.trim() || "/home/hero-bg.jpg";
+  const mapLabelTitle = content.mapLabelTitle?.trim() || "ADAM HQ DUBAI";
+  const mapLabelSubtitle = content.mapLabelSubtitle?.trim() || "";
+  const mapLabel = mapLabelSubtitle ? `${mapLabelTitle} • ${mapLabelSubtitle}` : mapLabelTitle;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -51,17 +63,16 @@ export default function ContactInquirySection({ content }: { content: ContactInq
       <div className="section-shell contact-inquiry__reference-shell">
         <div className="contact-inquiry__hero-row">
           <div className="contact-inquiry__hero-left">
-            <p className="contact-inquiry__eyebrow">PROTOCOL: COMMUNICATION</p>
+            <p className="contact-inquiry__eyebrow">{heroEyebrow}</p>
             <h2 className="contact-inquiry__reference-title">
-              <span>CONNECT</span>
-              <span>SECURELY</span>
+              {heroTitleLines.map((line, index) => (
+                <span key={`${line}-${index}`}>{line}</span>
+              ))}
             </h2>
           </div>
           <div className="contact-inquiry__hero-right" aria-label="Enterprise description">
             <span className="contact-inquiry__hero-divider" aria-hidden="true" />
-            <p className="contact-inquiry__side-copy">
-              ENTERPRISE-GRADE COMMUNICATION NODES FOR INDUSTRIAL SCALING AND TECHNOLOGICAL SOVEREIGNTY.
-            </p>
+            <p className="contact-inquiry__side-copy">{heroSideCopy}</p>
           </div>
         </div>
 
@@ -162,8 +173,8 @@ export default function ContactInquirySection({ content }: { content: ContactInq
               </div>
             </div>
             <div className="contact-inquiry__visual-tile" aria-hidden="true">
-              <img src="/home/hero-bg.jpg" alt="" className="contact-inquiry__visual-image" />
-              <span className="contact-inquiry__visual-label">ADAM HQ DUBAI</span>
+              <img src={mapImage} alt="" className="contact-inquiry__visual-image" />
+              <span className="contact-inquiry__visual-label">{mapLabel}</span>
             </div>
           </aside>
         </div>

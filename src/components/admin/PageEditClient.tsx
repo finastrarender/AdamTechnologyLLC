@@ -233,6 +233,10 @@ function defaultSectionData(type: SectionType): Record<string, unknown> {
       };
     case "contactInquiry":
       return {
+        heroEyebrow: "PROTOCOL: COMMUNICATION",
+        heroTitleLines: ["CONNECT", "SECURELY"],
+        heroSideCopy:
+          "ENTERPRISE-GRADE COMMUNICATION NODES FOR INDUSTRIAL SCALING AND TECHNOLOGICAL SOVEREIGNTY.",
         formTitle: "Initialize Inquiry",
         formDescription: "Complete the transmission parameters below.",
         submitLabel: "Send Message",
@@ -255,7 +259,7 @@ function defaultSectionData(type: SectionType): Record<string, unknown> {
           errorMessage: "Network error",
         },
         mapImage: "/home/hero-bg.jpg",
-        mapLabelTitle: "",
+        mapLabelTitle: "ADAM HQ DUBAI",
         mapLabelSubtitle: "",
       };
     default:

@@ -45,6 +45,12 @@ export default function AboutVisionMissionSection({
       '"A world where data is as structural and reliable as steel. We envision the total convergence of industrial engineering and digital protocol."',
     badge: "PROTOCOL ACTIVE",
   };
+  const visionAction =
+    (vision as unknown as { action?: { label?: string; href?: string } }).action ??
+    (content as unknown as { visionAction?: { label?: string; href?: string } }).visionAction;
+  const visionActionLabel = String(visionAction?.label ?? "").trim();
+  const visionActionHref = String(visionAction?.href ?? "").trim();
+  const shouldShowVisionAction = Boolean(visionActionLabel && visionActionHref);
 
   return (
     <section className="about-panels">
@@ -64,6 +70,11 @@ export default function AboutVisionMissionSection({
           <p className="about-panels__vision-icon" aria-hidden="true">◉</p>
           <h3 className="about-panels__vision-title">{vision.title}</h3>
           <p className="about-panels__vision-quote">{vision.quote}</p>
+          {shouldShowVisionAction ? (
+            <a className="about-panels__vision-action" href={visionActionHref}>
+              {visionActionLabel}
+            </a>
+          ) : null}
           <p className="about-panels__vision-badge">
             <span className="about-panels__vision-dot" aria-hidden="true" /> {vision.badge}
           </p>

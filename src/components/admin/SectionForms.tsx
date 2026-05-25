@@ -871,9 +871,7 @@ export function ServicesGridSectionForm({
               Features (one per line)
               <textarea
                 rows={4}
-                {...register(`cards.${index}.featuresLines`, {
-                  required: "At least one feature is required",
-                })}
+                {...register(`cards.${index}.featuresLines`)}
                 placeholder={"Zero Trust\nEdge Monitoring\nSOC Ops"}
               />
             </label>
@@ -1008,7 +1006,7 @@ export function WhyChooseSectionForm({
       <SectionHeading section={section} />
       <label>
         Title
-        <input {...register("title", { required: true })} placeholder="(Optional) Leave blank to hide header" />
+        <input {...register("title")} placeholder="(Optional) Leave blank to hide header" />
       </label>
       <label>
         Subheading
@@ -3630,6 +3628,9 @@ export function IndustriesCtaSectionForm({
 }
 
 type ContactInquiryFormValues = {
+  heroEyebrow: string;
+  heroTitleLinesText: string;
+  heroSideCopy: string;
   formTitle: string;
   formDescription: string;
   submitLabel: string;
@@ -3646,6 +3647,9 @@ type ContactInquiryFormValues = {
   disclaimerText: string;
   successMessage: string;
   errorMessage: string;
+  mapImage: string;
+  mapLabelTitle: string;
+  mapLabelSubtitle: string;
 };
 
 function toContactInquiryDefaultValues(
@@ -3655,8 +3659,17 @@ function toContactInquiryDefaultValues(
     ? (data.officeItems as Record<string, unknown>[])
     : [];
   const formFields = (data.formFields as Record<string, unknown>) ?? {};
+  const heroTitleLines = Array.isArray(data.heroTitleLines)
+    ? (data.heroTitleLines as string[])
+    : [];
 
   return {
+    heroEyebrow: (data.heroEyebrow as string) ?? "PROTOCOL: COMMUNICATION",
+    heroTitleLinesText:
+      heroTitleLines.length > 0 ? heroTitleLines.join("\n") : "CONNECT\nSECURELY",
+    heroSideCopy:
+      (data.heroSideCopy as string) ??
+      "ENTERPRISE-GRADE COMMUNICATION NODES FOR INDUSTRIAL SCALING AND TECHNOLOGICAL SOVEREIGNTY.",
     formTitle: (data.formTitle as string) ?? "",
     formDescription: (data.formDescription as string) ?? "",
     submitLabel: (data.submitLabel as string) ?? "",
@@ -3690,6 +3703,9 @@ function toContactInquiryDefaultValues(
       (formFields.successMessage as string) ??
       "Thank you — our consultants will be in touch shortly.",
     errorMessage: (formFields.errorMessage as string) ?? "Network error",
+    mapImage: (data.mapImage as string) ?? "/home/hero-bg.jpg",
+    mapLabelTitle: (data.mapLabelTitle as string) ?? "ADAM HQ DUBAI",
+    mapLabelSubtitle: (data.mapLabelSubtitle as string) ?? "",
   };
 }
 
@@ -3708,15 +3724,24 @@ export function ContactInquirySectionForm({
     register,
     control,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ContactInquiryFormValues>({ defaultValues });
   const { fields, append, remove } = useFieldArray({
     control,
     name: "officeItems",
   });
+  const mapImage = watch("mapImage");
 
   function handleValid(values: ContactInquiryFormValues) {
     onSave({
+      heroEyebrow: values.heroEyebrow.trim(),
+      heroTitleLines: values.heroTitleLinesText
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean),
+      heroSideCopy: values.heroSideCopy.trim(),
       formTitle: values.formTitle,
       formDescription: values.formDescription,
       submitLabel: values.submitLabel,
@@ -3745,10 +3770,9 @@ export function ContactInquirySectionForm({
         successMessage: values.successMessage.trim(),
         errorMessage: values.errorMessage.trim(),
       },
-      // Not used by the current design, but required by the schema.
-      mapImage: "/home/hero-bg.jpg",
-      mapLabelTitle: "",
-      mapLabelSubtitle: "",
+      mapImage: values.mapImage.trim(),
+      mapLabelTitle: values.mapLabelTitle.trim(),
+      mapLabelSubtitle: values.mapLabelSubtitle.trim(),
     });
   }
 
@@ -3763,6 +3787,42 @@ export function ContactInquirySectionForm({
       }}
     >
       <SectionHeading section={section} />
+
+      <label>
+        Hero eyebrow
+        <input
+          {...register("heroEyebrow", { required: "Hero eyebrow is required" })}
+        />
+        {errors.heroEyebrow ? (
+          <p className="admin-field-error">{errors.heroEyebrow.message}</p>
+        ) : null}
+      </label>
+
+      <label>
+        Hero title lines (one per line)
+        <textarea
+          rows={3}
+          {...register("heroTitleLinesText", {
+            required: "Hero title lines are required",
+          })}
+        />
+        {errors.heroTitleLinesText ? (
+          <p className="admin-field-error">
+            {errors.heroTitleLinesText.message}
+          </p>
+        ) : null}
+      </label>
+
+      <label>
+        Hero side copy
+        <textarea
+          rows={3}
+          {...register("heroSideCopy", { required: "Hero side copy is required" })}
+        />
+        {errors.heroSideCopy ? (
+          <p className="admin-field-error">{errors.heroSideCopy.message}</p>
+        ) : null}
+      </label>
 
       <label>
         Form title
@@ -3878,6 +3938,48 @@ export function ContactInquirySectionForm({
         >
           Add office item
         </button>
+      </div>
+
+      <div className="admin-section-group">
+        <h4>Visual tile</h4>
+        <input
+          type="hidden"
+          {...register("mapImage", {
+            required: "Visual tile image URL is required",
+          })}
+        />
+        <ImageUploadField
+          label="Visual tile image URL"
+          value={mapImage}
+          onChange={(value) =>
+            setValue("mapImage", value, {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+          }
+          folder={`sections/${section.type}`}
+          placeholder="/sections/contact/map-image.webp"
+        />
+        {errors.mapImage ? (
+          <p className="admin-field-error">{errors.mapImage.message}</p>
+        ) : null}
+
+        <label>
+          Label title
+          <input
+            {...register("mapLabelTitle", {
+              required: "Label title is required",
+            })}
+          />
+          {errors.mapLabelTitle ? (
+            <p className="admin-field-error">{errors.mapLabelTitle.message}</p>
+          ) : null}
+        </label>
+
+        <label>
+          Label subtitle (optional)
+          <input {...register("mapLabelSubtitle")} />
+        </label>
       </div>
 
       <div className="admin-section-group">
@@ -4520,6 +4622,8 @@ type AboutVisionMissionFormValues = {
   visionTitle: string;
   visionQuote: string;
   visionBadge: string;
+  visionActionLabel: string;
+  visionActionHref: string;
 };
 
 function toAboutVisionMissionDefaultValues(
@@ -4566,6 +4670,12 @@ function toAboutVisionMissionDefaultValues(
     visionBadge:
       ((data.vision as Record<string, unknown> | undefined)?.badge as string) ??
       "PROTOCOL ACTIVE",
+    visionActionLabel:
+      (((data.vision as Record<string, unknown> | undefined)?.action as Record<string, unknown> | undefined)?.label as string) ??
+      "",
+    visionActionHref:
+      (((data.vision as Record<string, unknown> | undefined)?.action as Record<string, unknown> | undefined)?.href as string) ??
+      "",
   };
 }
 
@@ -4603,6 +4713,13 @@ export function AboutVisionMissionSectionForm({
         title: values.visionTitle,
         quote: values.visionQuote,
         badge: values.visionBadge,
+        action:
+          values.visionActionLabel.trim() && values.visionActionHref.trim()
+            ? {
+                label: values.visionActionLabel.trim(),
+                href: values.visionActionHref.trim(),
+              }
+            : undefined,
       },
     });
   }
@@ -4621,6 +4738,50 @@ export function AboutVisionMissionSectionForm({
 
       <div>
         <h4>Mission and Vision Cards</h4>
+
+        <div className="admin-section-group">
+          <h4>Vision 2030 block</h4>
+          <label>
+            Vision title
+            <input
+              {...register("visionTitle", {
+                required: "Vision title is required",
+              })}
+            />
+          </label>
+          <label>
+            Vision quote
+            <textarea
+              rows={4}
+              {...register("visionQuote", {
+                required: "Vision quote is required",
+              })}
+            />
+          </label>
+          <label>
+            Vision badge text
+            <input
+              {...register("visionBadge", {
+                required: "Vision badge is required",
+              })}
+            />
+          </label>
+          <label>
+            Vision button label (optional)
+            <input
+              {...register("visionActionLabel")}
+              placeholder="DOWNLOAD REPORT"
+            />
+          </label>
+          <label>
+            Vision button link (optional)
+            <input
+              {...register("visionActionHref")}
+              placeholder="/files/report.pdf"
+            />
+          </label>
+        </div>
+
         {fields.map((field, index) => (
           <div
             key={field.id}
@@ -4836,22 +4997,6 @@ export function AboutFrameworkSectionForm({
             </label>
           </div>
         ))}
-      </div>
-
-      <div className="admin-section-group">
-        <h4>Vision block</h4>
-        <label>
-          Vision title
-          <input {...register("visionTitle", { required: "Vision title is required" })} />
-        </label>
-        <label>
-          Vision quote
-          <textarea rows={4} {...register("visionQuote", { required: "Vision quote is required" })} />
-        </label>
-        <label>
-          Vision badge text
-          <input {...register("visionBadge", { required: "Vision badge is required" })} />
-        </label>
       </div>
 
       <SectionSaveFooter
@@ -5528,60 +5673,6 @@ export function ResearchHubSectionForm({
           <label>Description<textarea rows={3} {...register("pillar3Description")} /></label>
           <label>Project label<input {...register("pillar3Project")} /></label>
         </div>
-      </div>
-
-      <div className="admin-section-group">
-        <h4>Global reach block</h4>
-        <label>
-          Reach title
-          <input {...register("reachTitle", { required: true })} />
-        </label>
-
-        <input type="hidden" {...register("reachImage", { required: true })} />
-        <ImageUploadField
-          label="Reach image URL"
-          value={reachImage}
-          onChange={(value) =>
-            setValue("reachImage", value, {
-              shouldDirty: true,
-              shouldValidate: true,
-            })
-          }
-          folder={`sections/${section.type}/reach`}
-        />
-
-        <label>
-          Metric 1 value
-          <input {...register("reachMetric1Value", { required: true })} />
-        </label>
-        <label>
-          Metric 1 label
-          <input {...register("reachMetric1Label", { required: true })} />
-        </label>
-        <label>
-          Metric 2 value
-          <input {...register("reachMetric2Value", { required: true })} />
-        </label>
-        <label>
-          Metric 2 label
-          <input {...register("reachMetric2Label", { required: true })} />
-        </label>
-        <label>
-          Metric 3 value
-          <input {...register("reachMetric3Value", { required: true })} />
-        </label>
-        <label>
-          Metric 3 label
-          <input {...register("reachMetric3Label", { required: true })} />
-        </label>
-        <label>
-          Metric 4 value
-          <input {...register("reachMetric4Value", { required: true })} />
-        </label>
-        <label>
-          Metric 4 label
-          <input {...register("reachMetric4Label", { required: true })} />
-        </label>
       </div>
 
       <div className="admin-section-group">

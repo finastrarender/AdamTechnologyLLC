@@ -27,6 +27,41 @@
   --shell-width: 1120px;
 }
 
+@media (min-width: 1900px) {
+  :root {
+    --shell-width: 1320px;
+  }
+}
+
+@media (min-width: 2000px) {
+  :root {
+    --shell-width: 1400px;
+  }
+
+  .hero-section .section-shell {
+    width: min(var(--shell-width), calc(100% - 48px));
+    margin-inline: auto;
+  }
+
+  .intro-section__content {
+    max-width: var(--shell-width);
+  }
+
+  .about-cta__card {
+    max-width: var(--shell-width);
+  }
+
+  .logos-section__grid {
+    max-width: var(--shell-width);
+    margin-inline: auto;
+  }
+
+  .about-values__reach {
+    max-width: var(--shell-width);
+    margin-inline: auto;
+  }
+}
+
 @media (max-width: 360px) {
   .site-footer__legal {
     grid-template-columns: 1fr;
@@ -1847,7 +1882,9 @@ button {
   font-family: var(--font-display);
   font-size: 1.125rem;
   color: var(--color-heading);
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .about-value-card__description {
@@ -7447,6 +7484,29 @@ button {
   font-weight: 700;
   letter-spacing: 0.11em;
   text-transform: uppercase;
+}
+
+.about-panels__vision-action {
+  margin-top: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 18px;
+  border: 1px solid rgba(53, 83, 114, 0.62);
+  color: #dbe5f4;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.about-panels__vision-action:hover {
+  background: rgba(219, 229, 244, 0.06);
+  border-color: rgba(62, 216, 255, 0.7);
+  color: #ffffff;
 }
 
 .about-panels__vision-dot {

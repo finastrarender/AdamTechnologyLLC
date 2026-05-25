@@ -340,6 +340,9 @@ const contactFormFieldsSchema = z.object({
 });
 
 export const contactInquiryDataSchema = z.object({
+  heroEyebrow: z.string().optional(),
+  heroTitleLines: z.array(z.string()).optional(),
+  heroSideCopy: z.string().optional(),
   formTitle: z.string(),
   formDescription: z.string(),
   submitLabel: z.string(),
@@ -412,6 +415,12 @@ export const aboutVisionMissionDataSchema = z.object({
       title: z.string(),
       quote: z.string(),
       badge: z.string(),
+      action: z
+        .object({
+          label: z.string(),
+          href: z.string(),
+        })
+        .optional(),
     })
     .optional(),
 });
