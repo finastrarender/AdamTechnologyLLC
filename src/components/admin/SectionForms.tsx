@@ -531,11 +531,9 @@ export function ServicesSectionForm({
                 )}
               />
               <FieldHint>
-                Choose an icon:{" "}
-                {HOME_SERVICE_CARD_ICON_OPTIONS.map(
+                {`Choose an icon: ${HOME_SERVICE_CARD_ICON_OPTIONS.map(
                   (key) => iconOptionLabels[key] ?? key,
-                ).join(", ")}
-                .
+                ).join(", ")}.`}
               </FieldHint>
               {errors.cards?.[index]?.icon ? (
                 <p className="admin-field-error">
