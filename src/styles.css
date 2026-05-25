@@ -7685,11 +7685,6 @@ button {
   padding: 0 0 26px;
 }
 
-.about-panels .section-shell {
-  max-width: 1180px;
-  margin: 0 auto;
-}
-
 .about-panels__top {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -8154,8 +8149,8 @@ button {
 }
 
 .about-hero .section-shell,
-.about-panels .section-shell,
-.about-values .section-shell {
+.about-values .section-shell,
+.about-panels .section-shell {
   width: 100%;
   max-width: none;
   margin: 0;
@@ -8164,15 +8159,9 @@ button {
 
 @media (min-width: 1200px) {
   .about-hero .section-shell,
-  .about-values .section-shell {
-    padding-inline: clamp(32px, 5vw, 96px);
-  }
-
+  .about-values .section-shell,
   .about-panels .section-shell {
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    padding-inline: 0;
+    padding-inline: clamp(32px, 5vw, 96px);
   }
 
   .about-hero {
@@ -8226,7 +8215,8 @@ button {
 
   .about-panel {
     min-height: 264px;
-    padding: clamp(36px, 4vw, 48px) clamp(32px, 3.4vw, 40px);
+    padding-top: clamp(36px, 4vw, 48px);
+    padding-bottom: clamp(36px, 4vw, 48px);
     align-items: flex-start;
     text-align: left;
   }
@@ -8331,16 +8321,16 @@ button {
 
 @media (max-width: 1199px) {
   .about-hero .section-shell,
-  .about-panels .section-shell,
-  .about-values .section-shell {
+  .about-values .section-shell,
+  .about-panels .section-shell {
     padding-inline: var(--about-gutter-tablet);
   }
 }
 
 @media (max-width: 767px) {
   .about-hero .section-shell,
-  .about-panels .section-shell,
-  .about-values .section-shell {
+  .about-values .section-shell,
+  .about-panels .section-shell {
     padding-inline: var(--about-gutter-mobile);
   }
 
@@ -8358,13 +8348,6 @@ button {
   background:
     radial-gradient(circle at center, rgba(9, 9, 9, 0.05) 5%, rgba(9, 9, 9, 0) 100%),
     #090909;
-}
-
-.about-panels .section-shell {
-  width: 100%;
-  max-width: none;
-  margin: 0 auto;
-  padding-inline: clamp(18px, 3.2vw, 44px);
 }
 
 .about-panels__top {
@@ -8432,12 +8415,6 @@ button {
   color: #2fd7fb;
 }
 
-@media (min-width: 1200px) {
-  .about-panels .section-shell {
-    padding-inline: 0;
-  }
-}
-
 .about-panels__vision {
   margin-top: 14px;
   min-height: clamp(360px, 32vw, 480px);
@@ -8484,10 +8461,6 @@ button {
 }
 
 @media (min-width: 1400px) {
-  .about-panels .section-shell {
-    padding-inline: clamp(22px, 2.5vw, 56px);
-  }
-
   .about-panel {
     min-height: 236px;
     padding: clamp(36px, 4vw, 48px) clamp(32px, 3.4vw, 44px);
@@ -8499,10 +8472,6 @@ button {
 }
 
 @media (max-width: 1023px) {
-  .about-panels .section-shell {
-    padding-inline: 14px;
-  }
-
   .about-panels__top {
     grid-template-columns: 1fr;
   }
@@ -9129,6 +9098,7 @@ button {
 .about-intro .section-shell,
 .about-advantage .section-shell,
 .about-values .section-shell,
+.about-panels .section-shell,
 .about-framework .section-shell,
 .about-cta .section-shell {
   width: 100%;
@@ -9137,7 +9107,6 @@ button {
   padding-inline: clamp(20px, 4vw, 64px);
 }
 
-.about-panels,
 .about-framework,
 .about-cta {
   padding-inline: clamp(20px, 4vw, 64px);
@@ -9152,9 +9121,9 @@ button {
   .about-intro .section-shell,
   .about-advantage .section-shell,
   .about-values .section-shell,
+  .about-panels .section-shell,
   .about-framework .section-shell,
   .about-cta .section-shell,
-  .about-panels,
   .about-framework,
   .about-cta {
     padding-inline: 16px;
@@ -9166,9 +9135,9 @@ button {
   .about-intro .section-shell,
   .about-advantage .section-shell,
   .about-values .section-shell,
+  .about-panels .section-shell,
   .about-framework .section-shell,
   .about-cta .section-shell,
-  .about-panels,
   .about-framework,
   .about-cta {
     padding-inline: 12px;
@@ -9203,9 +9172,6 @@ button {
   }
 
   .about-panels .section-shell {
-    width: 100%;
-    max-width: none;
-    margin: 0;
     padding-inline: clamp(32px, 5vw, 96px);
   }
 
@@ -9215,7 +9181,8 @@ button {
 
   .about-panel {
     min-height: 220px;
-    padding: clamp(32px, 4vw, 48px) clamp(28px, 3vw, 40px);
+    padding-top: clamp(32px, 4vw, 48px);
+    padding-bottom: clamp(32px, 4vw, 48px);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
