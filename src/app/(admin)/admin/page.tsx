@@ -22,7 +22,6 @@ export default async function AdminDashboardPage() {
         <div className="admin-dashboard__nav-links">
           <Link href="/">View site</Link>
           <Link href="/admin/site-global">Site global</Link>
-          <Link href="/admin/apply-now">Apply now modal</Link>
           <LogoutButton />
         </div>
       </nav>
@@ -91,9 +90,6 @@ export default async function AdminDashboardPage() {
           <div className="admin-dashboard__quick-links">
             <Link href="/admin/site-global" className="admin-button-secondary">
               Edit site global settings
-            </Link>
-            <Link href="/admin/apply-now" className="admin-button-secondary">
-              Edit Apply Now modal
             </Link>
             <Link href="/" className="admin-button-secondary">
               Open public website
