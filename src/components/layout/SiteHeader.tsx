@@ -41,7 +41,7 @@ export default function SiteHeader({
     { keys: ["home"], href: "/", label: "HOME" },
     { keys: ["services"], href: "/services", label: "SERVICES" },
     { keys: ["about", "about us"], href: "/about", label: "ABOUT US" },
-    { keys: ["contact", "contact us"], href: "/contact", label: "CONTACT" },
+    { keys: ["contact", "contact us"], href: "/contact", label: "CONTACT US" },
   ];
 
   const displayNavItems = preferredNav
@@ -60,6 +60,28 @@ export default function SiteHeader({
             <span className="brand__title">ADAMTECH</span>
           </Link>
         </div>
+
+        <nav
+          className={`site-nav${isMenuOpen ? " is-open" : ""}`}
+          id="site-navigation"
+          aria-label="Primary"
+        >
+          {displayNavItems.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <Link
+                key={item.label}
+                className={`site-nav__link${active ? " site-nav__link--active" : ""}`}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {item.label}
+                {active && <span className="underline" />}
+              </Link>
+            );
+          })}
+        </nav>
 
         <button
           className={`menu-toggle${isMenuOpen ? " is-open" : ""}`}
@@ -96,28 +118,6 @@ export default function SiteHeader({
             onClick={() => setIsMenuOpen(false)}
           />
         ) : null}
-
-        <nav
-          className={`site-nav${isMenuOpen ? " is-open" : ""}`}
-          id="site-navigation"
-          aria-label="Primary"
-        >
-          {displayNavItems.map((item) => {
-            const active = isActive(pathname, item.href);
-            return (
-              <Link
-                key={item.label}
-                className={`site-nav__link${active ? " site-nav__link--active" : ""}`}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.label}
-                {active && <span className="underline" />}
-              </Link>
-            );
-          })}
-        </nav>
       </div>
     </header>
   );
