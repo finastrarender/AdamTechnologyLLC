@@ -18,7 +18,6 @@ export default function SiteHeader({
 }) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const applyHref = `${pathname}?apply=1`;
 
   useEffect(() => {
     setIsMenuOpen(false);
@@ -101,7 +100,7 @@ export default function SiteHeader({
         <div className="site-header__actions">
           <span className="header-badge">DUBAI LICENSED</span>
           <Link
-            href={applyHref}
+            href="/contact"
             className="header-button"
             aria-label="Inquire"
             onClick={() => setIsMenuOpen(false)}

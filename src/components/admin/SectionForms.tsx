@@ -3663,8 +3663,11 @@ type ContactInquiryFormValues = {
   officeHeading: string;
   officeItems: ContactOfficeItemFormValue[];
   fullNameLabel: string;
+  fullNamePlaceholder: string;
   companyLabel: string;
+  companyPlaceholder: string;
   workEmailLabel: string;
+  workEmailPlaceholder: string;
   interestLabel: string;
   interestPlaceholder: string;
   messageLabel: string;
@@ -3713,14 +3716,17 @@ function toContactInquiryDefaultValues(
           }))
         : [{ title: "", linesText: "", icon: "location" }],
     fullNameLabel: (formFields.fullNameLabel as string) ?? "Identifier / Name",
+    fullNamePlaceholder: (formFields.fullNamePlaceholder as string) ?? "ENTER FULL NAME",
     companyLabel: (formFields.companyLabel as string) ?? "Organization / Company",
+    companyPlaceholder: (formFields.companyPlaceholder as string) ?? "ENTER COMPANY NAME",
     workEmailLabel: (formFields.workEmailLabel as string) ?? "Secure Email Endpoint",
+    workEmailPlaceholder: (formFields.workEmailPlaceholder as string) ?? "EMAIL@DOMAIN.COM",
     interestLabel: (formFields.interestLabel as string) ?? "Operation Type / Service",
     interestPlaceholder:
-      (formFields.interestPlaceholder as string) ?? "Select infrastructure module",
+      (formFields.interestPlaceholder as string) ?? "SELECT INFRASTRUCTURE MODULE",
     messageLabel: (formFields.messageLabel as string) ?? "Message Payload",
     messagePlaceholder:
-      (formFields.messagePlaceholder as string) ?? "Transmit your requirements...",
+      (formFields.messagePlaceholder as string) ?? "TRANSMIT YOUR REQUIREMENTS...",
     disclaimerText:
       (formFields.disclaimerText as string) ??
       "By submitting this form, you agree to our privacy policy and data handling terms.",
@@ -3785,8 +3791,11 @@ export function ContactInquirySectionForm({
       })),
       formFields: {
         fullNameLabel: values.fullNameLabel.trim(),
+        fullNamePlaceholder: values.fullNamePlaceholder.trim(),
         companyLabel: values.companyLabel.trim(),
+        companyPlaceholder: values.companyPlaceholder.trim(),
         workEmailLabel: values.workEmailLabel.trim(),
+        workEmailPlaceholder: values.workEmailPlaceholder.trim(),
         interestLabel: values.interestLabel.trim(),
         interestPlaceholder: values.interestPlaceholder.trim(),
         messageLabel: values.messageLabel.trim(),
@@ -4008,10 +4017,13 @@ export function ContactInquirySectionForm({
       </div>
 
       <div className="admin-section-group">
-        <h4>Form field labels</h4>
+        <h4>Form field labels &amp; placeholders</h4>
         <label>Full name label<input {...register("fullNameLabel", { required: true })} /></label>
+        <label>Full name placeholder<input {...register("fullNamePlaceholder", { required: true })} /></label>
         <label>Company label<input {...register("companyLabel", { required: true })} /></label>
+        <label>Company placeholder<input {...register("companyPlaceholder", { required: true })} /></label>
         <label>Work email label<input {...register("workEmailLabel", { required: true })} /></label>
+        <label>Work email placeholder<input {...register("workEmailPlaceholder", { required: true })} /></label>
         <label>Primary interest label<input {...register("interestLabel", { required: true })} /></label>
         <label>Primary interest placeholder<input {...register("interestPlaceholder", { required: true })} /></label>
         <label>Message label<input {...register("messageLabel", { required: true })} /></label>

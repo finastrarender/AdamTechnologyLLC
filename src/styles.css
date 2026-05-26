@@ -8638,6 +8638,28 @@ button {
   resize: vertical;
 }
 
+@media (min-width: 1200px) {
+  .contact-inquiry__input {
+    font-size: 1rem;
+  }
+
+  .contact-inquiry__form--reference .contact-inquiry__input {
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 12px 0 10px;
+  }
+
+  .contact-inquiry__form--reference .contact-inquiry__textarea {
+    min-height: 88px;
+  }
+
+  .contact-inquiry__form--reference .contact-inquiry__select {
+    background-position:
+      calc(100% - 18px) 50%,
+      calc(100% - 12px) 50%;
+  }
+}
+
 .contact-inquiry__footer-row {
   display: flex;
   align-items: center;

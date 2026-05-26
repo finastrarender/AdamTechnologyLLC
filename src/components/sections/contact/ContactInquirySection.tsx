@@ -87,22 +87,42 @@ export default function ContactInquirySection({ content }: { content: ContactInq
               <div className="contact-inquiry__row">
                 <label className="contact-inquiry__field">
                   <span>{formFields.fullNameLabel ?? "Identifier / Name"}</span>
-                  <input suppressHydrationWarning name="name" type="text" required className="contact-inquiry__input" />
+                  <input
+                    suppressHydrationWarning
+                    name="name"
+                    type="text"
+                    required
+                    className="contact-inquiry__input"
+                    placeholder={formFields.fullNamePlaceholder ?? "ENTER FULL NAME"}
+                  />
                 </label>
                 <label className="contact-inquiry__field">
                   <span>{formFields.companyLabel ?? "Organization / Company"}</span>
-                  <input suppressHydrationWarning name="company" type="text" className="contact-inquiry__input" />
+                  <input
+                    suppressHydrationWarning
+                    name="company"
+                    type="text"
+                    className="contact-inquiry__input"
+                    placeholder={formFields.companyPlaceholder ?? "ENTER COMPANY NAME"}
+                  />
                 </label>
               </div>
               <div className="contact-inquiry__row">
                 <label className="contact-inquiry__field">
                   <span>{formFields.workEmailLabel ?? "Secure Email Endpoint"}</span>
-                  <input suppressHydrationWarning name="email" type="email" required className="contact-inquiry__input" />
+                  <input
+                    suppressHydrationWarning
+                    name="email"
+                    type="email"
+                    required
+                    className="contact-inquiry__input"
+                    placeholder={formFields.workEmailPlaceholder ?? "EMAIL@DOMAIN.COM"}
+                  />
                 </label>
                 <label className="contact-inquiry__field">
                   <span>{formFields.interestLabel ?? "Operation Type / Service"}</span>
                   <select suppressHydrationWarning name="inquiryType" required className="contact-inquiry__input contact-inquiry__select">
-                    <option value="">{formFields.interestPlaceholder ?? "Select infrastructure module"}</option>
+                    <option value="">{formFields.interestPlaceholder ?? "SELECT INFRASTRUCTURE MODULE"}</option>
                     {content.inquiryOptions.map((option) => (
                       <option key={option} value={option}>
                         {option}
@@ -119,7 +139,7 @@ export default function ContactInquirySection({ content }: { content: ContactInq
                   required
                   rows={4}
                   className="contact-inquiry__input contact-inquiry__textarea"
-                  placeholder={formFields.messagePlaceholder ?? "Transmit your requirements..."}
+                  placeholder={formFields.messagePlaceholder ?? "TRANSMIT YOUR REQUIREMENTS..."}
                 />
               </label>
               <input suppressHydrationWarning name="phone" type="hidden" value="" readOnly />

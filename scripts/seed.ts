@@ -564,9 +564,28 @@ const aboutValuesData = {
   },
 };
 const contactInquiryData = {
+  heroEyebrow: "PROTOCOL: COMMUNICATION",
+  heroTitleLines: ["CONNECT", "SECURELY"],
+  heroSideCopy:
+    "ENTERPRISE-GRADE COMMUNICATION NODES FOR INDUSTRIAL SCALING AND TECHNOLOGICAL SOVEREIGNTY.",
   formTitle: "Initialize Inquiry",
   formDescription: "Complete the transmission parameters below.",
   submitLabel: "Send Message",
+  formFields: {
+    fullNameLabel: "Identifier / Name",
+    fullNamePlaceholder: "ENTER FULL NAME",
+    companyLabel: "Organization / Company",
+    companyPlaceholder: "ENTER COMPANY NAME",
+    workEmailLabel: "Secure Email Endpoint",
+    workEmailPlaceholder: "EMAIL@DOMAIN.COM",
+    interestLabel: "Operation Type / Service",
+    interestPlaceholder: "SELECT INFRASTRUCTURE MODULE",
+    messageLabel: "Message Payload",
+    messagePlaceholder: "TRANSMIT YOUR REQUIREMENTS...",
+    disclaimerText: "SYSTEM STATUS: READY FOR TRANSMISSION",
+    successMessage: "Thank you — our consultants will be in touch shortly.",
+    errorMessage: "Network error",
+  },
   inquiryOptions: [
     "Cybersecurity Architecture",
     "Cloud Infrastructure",
