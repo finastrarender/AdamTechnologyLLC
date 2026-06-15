@@ -158,7 +158,7 @@ const PAGES_TO_ENSURE: PageSeed[] = [
     }),
   ],
 
-  seoTitle: "Services | OWCC FZE",
+  seoTitle: "Services | Adam Technology L.L.C.",
   seoDescription:
     "Explore our comprehensive financial, investment, and strategic consultancy services designed for global growth.",
 }

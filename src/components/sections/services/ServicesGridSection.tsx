@@ -1,134 +1,197 @@
-"use client";
 import type { z } from "zod";
-import type { servicesGridDataSchema } from "@/schemas/sections";
+import type { servicesGridCardReferenceSchema, servicesGridDataSchema } from "@/schemas/sections";
+import { DEFAULT_SERVICES_GRID, mergeServicesGridContent } from "@/data/services-reference";
+import { ServicesGridIcon } from "@/components/services/ServicesGridIcon";
+import {
+  resolveServicesGridIcon,
+  type ServicesGridIconKind,
+} from "@/components/services/services-grid-icon-utils";
 
 type ServicesGridContent = z.infer<typeof servicesGridDataSchema>;
+type ServiceCard = z.infer<typeof servicesGridCardReferenceSchema>;
 
-function ServicesGridIcon({ kind }: { kind: "shield" | "nodes" | "terminal" | "sync" }) {
-  if (kind === "shield") {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true" className="services-grid-card__icon">
-        <path
-          d="M12 3 5 6v6c0 5 3 8.7 7 10 4-1.3 7-5 7-10V6l-7-3zm0 3.2L16 8v3c0 3.1-1.5 5.7-4 7-2.5-1.3-4-3.9-4-7V8l4-1.8z"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.7"
-        />
-      </svg>
-    );
-  }
-
-  if (kind === "nodes") {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true" className="services-grid-card__icon">
-        <circle cx="5" cy="6" r="1.7" fill="currentColor" />
-        <circle cx="12" cy="4" r="1.7" fill="currentColor" />
-        <circle cx="19" cy="8" r="1.7" fill="currentColor" />
-        <circle cx="8" cy="14" r="1.7" fill="currentColor" />
-        <circle cx="16" cy="17" r="1.7" fill="currentColor" />
-        <path d="M6.5 6.4 10.2 4.8M13.6 4.7 17.2 7.2M6.3 7.4 7.4 12.4M9.4 13.5l5.1 2.8M17.6 9.6l-1.2 5.8" stroke="currentColor" strokeWidth="1.2" />
-      </svg>
-    );
-  }
-
-  if (kind === "terminal") {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true" className="services-grid-card__icon">
-        <path d="M4 6h16v12H4z" fill="none" stroke="currentColor" strokeWidth="1.6" />
-        <path d="m8 10 2 2-2 2M12 14h4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-      </svg>
-    );
-  }
-
+function ServiceCardHeader({ icon, title }: { icon: ServicesGridIconKind; title: string }) {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="services-grid-card__icon">
-      <path d="M12 4a8 8 0 1 0 8 8h-2.2a5.8 5.8 0 1 1-1.7-4.1l-2.1 2.1h6V4l-2.4 2.4A7.95 7.95 0 0 0 12 4z" fill="none" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M12 9v3.5l2.4 1.6" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
+    <div className="services-grid-card__header">
+      <span className="services-grid-card__icon-wrap" aria-hidden="true">
+        <ServicesGridIcon kind={icon} />
+      </span>
+      <h3 className="services-grid-card__title">{title}</h3>
+    </div>
   );
 }
 
-const ServicesGridSection = ({ content: _content }: { content: ServicesGridContent }) => {
-  
+function TechStackTags({ tags, label }: { tags: string[]; label?: string }) {
+  if (!tags.length) return null;
+
+  return (
+    <div className="services-grid-card__stack">
+      {label ? <p className="services-grid-card__label">{label}</p> : null}
+      <div className="services-grid-card__tags" aria-label={label ?? "Tags"}>
+        {tags.map((tag) => (
+          <span key={tag}>{tag}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FeatureList({ label, items }: { label: string; items: string[] }) {
+  if (!items.length) return null;
+
+  return (
+    <div className="services-grid-card__feature-group">
+      <p className="services-grid-card__label">{label}</p>
+      <ul className="services-grid-card__features">
+        {items.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function RequestBriefButton({
+  href,
+  label,
+  highlighted = false,
+  fullWidth = false,
+}: {
+  href: string;
+  label: string;
+  highlighted?: boolean;
+  fullWidth?: boolean;
+}) {
+  return (
+    <a
+      href={href}
+      className={`services-grid-card__cta${highlighted ? " services-grid-card__cta--primary" : ""}${fullWidth ? " services-grid-card__cta--full" : ""}`}
+    >
+      {label}
+    </a>
+  );
+}
+
+function FeaturedCyberCard({ card }: { card: ServiceCard }) {
+  const icon = resolveServicesGridIcon(card.icon);
+  const image = card.image?.trim() || DEFAULT_SERVICES_GRID.cybersecurity.image!;
+
+  return (
+    <article id="cybersecurity" className="services-grid-card services-grid-card--cyber">
+      <div className="services-grid-card__body services-grid-card__body--split">
+        <div className="services-grid-card__main">
+          <ServiceCardHeader icon={icon} title={card.title} />
+          <p className="services-grid-card__description">{card.description}</p>
+          <div className="services-grid-card__details">
+            <div className="services-grid-card__details-primary">
+              <FeatureList label="Key Features" items={card.features ?? []} />
+              <RequestBriefButton
+                href={card.ctaHref ?? "/contact"}
+                label={card.ctaLabel ?? "Request Technical Brief"}
+              />
+            </div>
+            <TechStackTags tags={card.tags ?? []} label={card.tagsLabel ?? "Tech Stack"} />
+          </div>
+        </div>
+        <div className="services-grid-card__media">
+          <img src={image} alt="" width={400} height={400} decoding="async" />
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function StandardCard({
+  card,
+  modifier,
+  anchorId,
+  showTagsOnly = false,
+}: {
+  card: ServiceCard;
+  modifier: string;
+  anchorId: string;
+  showTagsOnly?: boolean;
+}) {
+  const icon = resolveServicesGridIcon(card.icon);
+
+  return (
+    <article id={anchorId} className={`services-grid-card services-grid-card--${modifier}`}>
+      <ServiceCardHeader icon={icon} title={card.title} />
+      <p className="services-grid-card__description">{card.description}</p>
+      {showTagsOnly ? (
+        <TechStackTags tags={card.tags ?? []} />
+      ) : null}
+      <RequestBriefButton
+        href={card.ctaHref ?? "/contact"}
+        label={card.ctaLabel ?? "Request Technical Brief"}
+        fullWidth
+      />
+    </article>
+  );
+}
+
+function BlockchainCard({ card }: { card: ServiceCard }) {
+  const icon = resolveServicesGridIcon(card.icon);
+  const image = card.image?.trim() || DEFAULT_SERVICES_GRID.blockchain.image!;
+
+  return (
+    <article id="blockchain" className="services-grid-card services-grid-card--blockchain">
+      <ServiceCardHeader icon={icon} title={card.title} />
+      <p className="services-grid-card__description">{card.description}</p>
+      <div className="services-grid-card__media services-grid-card__media--inline">
+        <img src={image} alt="" width={560} height={200} decoding="async" />
+      </div>
+      <RequestBriefButton
+        href={card.ctaHref ?? "/contact"}
+        label={card.ctaLabel ?? "Request Technical Brief"}
+        fullWidth
+      />
+    </article>
+  );
+}
+
+function SoftwareCard({ card }: { card: ServiceCard }) {
+  const icon = resolveServicesGridIcon(card.icon);
+  const groups = card.featureGroups ?? DEFAULT_SERVICES_GRID.software.featureGroups ?? [];
+
+  return (
+    <article id="software" className="services-grid-card services-grid-card--software">
+      <ServiceCardHeader icon={icon} title={card.title} />
+      <p className="services-grid-card__description">{card.description}</p>
+      <div className="services-grid-card__columns">
+        {groups.map((group) => (
+          <FeatureList key={group.label} label={group.label} items={group.items} />
+        ))}
+      </div>
+      <RequestBriefButton
+        href={card.ctaHref ?? "/contact"}
+        label={card.ctaLabel ?? "Request Technical Brief"}
+        fullWidth
+      />
+    </article>
+  );
+}
+
+export default function ServicesGridSection({ content }: { content: ServicesGridContent }) {
+  const data = mergeServicesGridContent(content);
+
   return (
     <section className="services-grid-section">
-      <div className="section-shell">
+      <div className="section-shell services-grid-section__shell">
         <div className="services-grid-section__cards">
-          <div className="services-grid-row services-grid-row--top">
-            <article className="services-grid-card services-grid-card--1">
-              <span className="services-grid-card__icon-wrap" aria-hidden="true">
-                <ServicesGridIcon kind="shield" />
-              </span>
-              <h3 className="services-grid-card__title">CYBERSECURITY</h3>
-              <p className="services-grid-card__description">
-                Proactive threat neutralization and sovereign data protection. We deploy advanced
-                cryptographic standards and real-time mesh monitoring to secure enterprise perimeters.
-              </p>
-              <div className="services-grid-card__tags" aria-label="Cybersecurity capabilities">
-                <span>THREAT INTEL</span>
-                <span>ZERO TRUST</span>
-                <span>SOC+</span>
-              </div>
-              <div className="services-grid-card__watermark services-grid-card__watermark--shield" aria-hidden="true" />
-            </article>
+          <FeaturedCyberCard card={data.cybersecurity} />
 
-            <article className="services-grid-card services-grid-card--2">
-              <span className="services-grid-card__icon-wrap" aria-hidden="true">
-                <ServicesGridIcon kind="nodes" />
-              </span>
-              <h3 className="services-grid-card__title">DATA &amp; CLOUD</h3>
-              <p className="services-grid-card__description">
-                High-availability cloud orchestration. Scalable neural architectures designed for
-                99.99% uptime and hyper-efficient data throughput.
-              </p>
-              <ul className="services-grid-card__features">
-                <li>HYBRID MULTI-CLOUD</li>
-                <li>EDGE COMPUTING</li>
-              </ul>
-              <div className="services-grid-card__watermark services-grid-card__watermark--nodes" aria-hidden="true" />
-            </article>
+          <div className="services-grid-row services-grid-row--middle">
+            <StandardCard card={data.cloud} modifier="cloud" anchorId="cloud" showTagsOnly />
+            <StandardCard card={data.data} modifier="data" anchorId="data" showTagsOnly />
           </div>
 
           <div className="services-grid-row services-grid-row--bottom">
-            <article className="services-grid-card services-grid-card--3">
-              <span className="services-grid-card__icon-wrap" aria-hidden="true">
-                <ServicesGridIcon kind="terminal" />
-              </span>
-              <h3 className="services-grid-card__title">
-                SOFTWARE &amp;
-                <br />
-                DEVELOPMENT
-              </h3>
-              <p className="services-grid-card__description">
-                Mission-critical application development. Precision-engineered codebase built for
-                speed, modularity, and future-proof scaling.
-              </p>
-            </article>
-
-            <article className="services-grid-card services-grid-card--4">
-              <div className="services-grid-card__content">
-                <span className="services-grid-card__icon-wrap" aria-hidden="true">
-                  <ServicesGridIcon kind="sync" />
-                </span>
-                <h3 className="services-grid-card__title">
-                  CONSULTING &amp;
-                  <br />
-                  TRAINING
-                </h3>
-                <p className="services-grid-card__description">
-                  Empowering executive leadership through deep-tech audits and specialized personnel
-                  upskilling in emerging tech paradigms.
-                </p>
-              </div>
-              <div className="services-grid-card__visual" aria-hidden="true">
-                <div className="services-grid-card__wave" />
-              </div>
-            </article>
+            <BlockchainCard card={data.blockchain} />
+            <SoftwareCard card={data.software} />
           </div>
         </div>
       </div>
     </section>
   );
-};
-
-export default ServicesGridSection;
+}

@@ -9,8 +9,24 @@ import {
 } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import ImageUploadField from "@/components/admin/ImageUploadField";
+import { ServicesGridIconPicker } from "@/components/services/ServicesGridIcon";
+import { resolveServicesGridIcon } from "@/components/services/services-grid-icon-utils";
+import { DEFAULT_SERVICES_GRID } from "@/data/services-reference";
+import {
+  ABOUT_ADVANTAGE_SECTION_DEFAULT,
+  ABOUT_VALUES_SECTION_DEFAULT,
+  ABOUT_VISION_MISSION_SECTION_DEFAULT,
+  CONTACT_INQUIRY_SECTION_DEFAULT,
+  INTRO_SECTION_DEFAULT,
+  joinOverviewDescription,
+  splitOverviewDescription,
+} from "@/data/page-section-defaults";
 import SectionSaveFooter from "@/components/admin/SectionSaveFooter";
-import IconPicker, { HOME_SERVICE_CARD_ICON_OPTIONS } from "./IconPicker";
+import IconPicker, {
+  ABOUT_ADVANTAGE_ICON_OPTIONS,
+  ABOUT_VALUES_ICON_OPTIONS,
+  HOME_SERVICE_CARD_ICON_OPTIONS,
+} from "./IconPicker";
 
 type SectionRow = {
   id: string;
@@ -163,6 +179,7 @@ type IntroFormValues = {
   description: string;
   more: string;
   highlightsLines: string;
+  buttonLabel: string;
   href: string;
   image: string;
   expcount: number;
@@ -180,7 +197,9 @@ function toIntroDefaultValues(data: Record<string, unknown>): IntroFormValues {
     highlightsLines: Array.isArray(data.highlights)
       ? (data.highlights as string[]).join("\n")
       : "",
-    href: (data.href as string) ?? "",
+    buttonLabel:
+      (data.buttonLabel as string) ?? INTRO_SECTION_DEFAULT.buttonLabel,
+    href: (data.href as string) ?? INTRO_SECTION_DEFAULT.href,
     image: (data.image as string) ?? "",
     expcount: (data.expcount as number) ?? 0,
     // exptext: (data.exptext as string) ?? "",
@@ -210,22 +229,19 @@ export function IntroSectionForm({
 
   function handleValid(values: IntroFormValues) {
     onSave({
-      eyebrow: values.eyebrow,
+      eyebrow: "",
       title: values.titleLines
         .split("\n")
         .map((line) => line.trim())
         .filter(Boolean),
       description: values.description,
       more: values.more,
-      highlights: values.highlightsLines
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean),
+      highlights: [],
       image: values.image,
       icon: "",
+      buttonLabel: values.buttonLabel,
       href: values.href,
-      expcount: values.expcount,
-      // exptext: values.exptext,
+      expcount: 0,
     });
   }
 
@@ -240,18 +256,6 @@ export function IntroSectionForm({
       }}
     >
       <SectionHeading section={section} />
-
-      <label>
-        Eyebrow
-        <input
-          {...register("eyebrow", { required: "Eyebrow is required" })}
-          placeholder="Small intro text above the main heading"
-        />
-        <FieldHint>Use 2-6 words to introduce this section.</FieldHint>
-        {errors.eyebrow ? (
-          <p className="admin-field-error">{errors.eyebrow.message}</p>
-        ) : null}
-      </label>
 
       <label>
         Title lines (one per line)
@@ -291,12 +295,14 @@ export function IntroSectionForm({
       </label>
 
       <label>
-        Highlights (one per line)
-        <textarea
-          rows={3}
-          {...register("highlightsLines")}
-          placeholder={"Security-first architecture\nEnterprise operations\nCompliance-ready delivery"}
+        Button label
+        <input
+          {...register("buttonLabel", { required: "Button label is required" })}
+          placeholder="About us"
         />
+        {errors.buttonLabel ? (
+          <p className="admin-field-error">{errors.buttonLabel.message}</p>
+        ) : null}
       </label>
 
       <label>
@@ -307,27 +313,6 @@ export function IntroSectionForm({
         />
         {errors.href ? <p className="admin-field-error">{errors.href.message}</p> : null}
       </label>
-
-      <div>
-        <label>
-          Years of Experience
-          <input
-            {...register("expcount", {
-              required: "Experience count is required",
-              valueAsNumber: true,
-            })}
-            type="number"
-            placeholder="Number of years of experience"
-          />
-        </label>
-        {/* <label>
-          Experience Text
-          <input
-            {...register("exptext", { required: "Experience text is required" })}
-            placeholder="Description of your experience"
-          />
-        </label> */}
-      </div>
 
       <input
         type="hidden"
@@ -418,7 +403,9 @@ export function ServicesSectionForm({
   const { fields, append, remove } = useFieldArray({ control, name: "cards" });
   const iconOptionLabels: Record<string, string> = {
     shield: "Cybersecurity (shield)",
-    nodes: "Data & Cloud (network)",
+    cloud: "Data & Cloud (cloud)",
+    code: "Software & Development (code)",
+    nodes: "Consulting (network)",
     terminal: "Software & Development (terminal)",
     sync: "Consulting & Training (sync)",
     security: "Security",
@@ -763,46 +750,119 @@ export function ServicesAccordionSectionForm({
 }
 
 type ServicesGridCardFormValue = {
-  category: string;
   title: string;
   description: string;
-  featuresLines: string;
   icon: string;
+  image: string;
+  featuresLines: string;
+  tagsLines: string;
+  tagsLabel: string;
+  featureGroup1Label: string;
+  featureGroup1ItemsLines: string;
+  featureGroup2Label: string;
+  featureGroup2ItemsLines: string;
+  ctaLabel: string;
+  ctaHref: string;
 };
 
 type ServicesGridFormValues = {
-  cards: ServicesGridCardFormValue[];
+  cybersecurity: ServicesGridCardFormValue;
+  cloud: ServicesGridCardFormValue;
+  data: ServicesGridCardFormValue;
+  blockchain: ServicesGridCardFormValue;
+  software: ServicesGridCardFormValue;
 };
 
-function toServicesGridDefaultValues(
-  data: Record<string, unknown>,
-): ServicesGridFormValues {
-  const rawCards = Array.isArray(data.cards)
-    ? (data.cards as Record<string, unknown>[])
+const SERVICES_GRID_KEYS = [
+  "cybersecurity",
+  "cloud",
+  "data",
+  "blockchain",
+  "software",
+] as const;
+
+function linesToList(value: string) {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function listToLines(value: unknown) {
+  return Array.isArray(value) ? (value as string[]).join("\n") : "";
+}
+
+function toServicesGridCardFormValue(
+  card: Record<string, unknown> | undefined,
+  fallback: Record<string, unknown>,
+): ServicesGridCardFormValue {
+  const source = card ?? fallback;
+  const groups = Array.isArray(source.featureGroups)
+    ? (source.featureGroups as Array<{ label?: string; items?: string[] }>)
     : [];
 
   return {
-    cards:
-      rawCards.length > 0
-        ? rawCards.map((card) => ({
-            category: (card.category as string) ?? "",
-            title: (card.title as string) ?? "",
-            description: (card.description as string) ?? "",
-            featuresLines: Array.isArray(card.features)
-              ? (card.features as string[]).join("\n")
-              : "",
-            icon: (card.icon as string) ?? "security",
-          }))
-        : [
-            {
-              category: "",
-              title: "",
-              description: "",
-              featuresLines: "",
-              icon: "security",
-            },
-          ],
+    title: (source.title as string) ?? "",
+    description: (source.description as string) ?? "",
+    icon: (source.icon as string) ?? "",
+    image: (source.image as string) ?? "",
+    featuresLines: listToLines(source.features),
+    tagsLines: listToLines(source.tags),
+    tagsLabel: (source.tagsLabel as string) ?? "Tech Stack",
+    featureGroup1Label: groups[0]?.label ?? "",
+    featureGroup1ItemsLines: listToLines(groups[0]?.items),
+    featureGroup2Label: groups[1]?.label ?? "",
+    featureGroup2ItemsLines: listToLines(groups[1]?.items),
+    ctaLabel: (source.ctaLabel as string) ?? "Request Technical Brief",
+    ctaHref: (source.ctaHref as string) ?? "/contact",
   };
+}
+
+function toServicesGridDefaultValues(data: Record<string, unknown>): ServicesGridFormValues {
+  return SERVICES_GRID_KEYS.reduce((acc, key) => {
+    acc[key] = toServicesGridCardFormValue(
+      data[key] as Record<string, unknown> | undefined,
+      DEFAULT_SERVICES_GRID[key] as unknown as Record<string, unknown>,
+    );
+    return acc;
+  }, {} as ServicesGridFormValues);
+}
+
+function cardFormToPayload(card: ServicesGridCardFormValue, key: (typeof SERVICES_GRID_KEYS)[number]) {
+  const payload: Record<string, unknown> = {
+    title: card.title,
+    description: card.description,
+    icon: resolveServicesGridIcon(card.icon),
+    ctaLabel: card.ctaLabel,
+    ctaHref: card.ctaHref,
+  };
+
+  if (card.image.trim()) payload.image = card.image.trim();
+
+  const features = linesToList(card.featuresLines);
+  if (features.length) payload.features = features;
+
+  const tags = linesToList(card.tagsLines);
+  if (tags.length) payload.tags = tags;
+
+  if (card.tagsLabel.trim()) payload.tagsLabel = card.tagsLabel.trim();
+
+  if (key === "software") {
+    const featureGroups = [
+      {
+        label: card.featureGroup1Label.trim(),
+        items: linesToList(card.featureGroup1ItemsLines),
+      },
+      {
+        label: card.featureGroup2Label.trim(),
+        items: linesToList(card.featureGroup2ItemsLines),
+      },
+    ].filter((group) => group.label && group.items.length > 0);
+
+    if (featureGroups.length) payload.featureGroups = featureGroups;
+  }
+
+  return payload;
 }
 
 export function ServicesGridSectionForm({
@@ -823,25 +883,17 @@ export function ServicesGridSectionForm({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ServicesGridFormValues>({ defaultValues });
-  const { fields, append, remove } = useFieldArray({ control, name: "cards" });
 
   function handleValid(values: ServicesGridFormValues) {
-    onSave({
-      title: "",
-      description: "",
-      filters: ["ALL"],
-      cards: values.cards.map((card) => ({
-        category: card.category,
-        title: card.title,
-        description: card.description,
-        features: card.featuresLines
-          .split("\n")
-          .map((line) => line.trim())
-          .filter(Boolean),
-        cta: "",
-        icon: card.icon,
-      })),
-    });
+    onSave(
+      SERVICES_GRID_KEYS.reduce(
+        (acc, key) => {
+          acc[key] = cardFormToPayload(values[key], key);
+          return acc;
+        },
+        {} as Record<string, unknown>,
+      ),
+    );
   }
 
   return (
@@ -857,83 +909,122 @@ export function ServicesGridSectionForm({
       <SectionHeading section={section} />
 
       <p className="admin-field-hint">
-        This section is fixed to the reference layout (2x2 capability cards).
+        Fixed reference layout with five service cards. Use Cybersecurity and Blockchain image fields for card visuals.
       </p>
 
       <div className="admin-section-group">
-        <h4>Service cards</h4>
-        {fields.map((field, index) => (
-          <div key={field.id} className="admin-section-card">
-            <label>
-              Category tag
-              <input
-                {...register(`cards.${index}.category`, {
-                  required: "Category is required",
-                })}
-                placeholder="Threat Intel"
-              />
-            </label>
+        {SERVICES_GRID_KEYS.map((key) => (
+          <div key={key} className="admin-section-card">
+            <h4 style={{ textTransform: "capitalize" }}>{key.replace(/([A-Z])/g, " $1")}</h4>
             <label>
               Title
               <input
-                {...register(`cards.${index}.title`, {
-                  required: "Title is required",
-                })}
-                placeholder="CYBERSECURITY"
+                {...register(`${key}.title`, { required: "Title is required" })}
               />
             </label>
             <label>
               Description
-              <textarea
-                rows={4}
-                {...register(`cards.${index}.description`, {
-                  required: "Description is required",
-                })}
-                placeholder="Short capability description."
-              />
+              <textarea rows={4} {...register(`${key}.description`, { required: "Description is required" })} />
             </label>
             <label>
-              Features (one per line)
-              <textarea
-                rows={4}
-                {...register(`cards.${index}.featuresLines`)}
-                placeholder={"Zero Trust\nEdge Monitoring\nSOC Ops"}
+              Icon
+              <Controller
+                control={control}
+                name={`${key}.icon`}
+                render={({ field }) => (
+                  <ServicesGridIconPicker
+                    value={field.value}
+                    onChange={(value) => field.onChange(value)}
+                  />
+                )}
               />
+              <FieldHint>Pick the icon shown on the services page card header.</FieldHint>
+            </label>
+            {(key === "cybersecurity" || key === "blockchain") && (
+              <Controller
+                control={control}
+                name={`${key}.image`}
+                render={({ field }) => (
+                  <ImageUploadField
+                    label="Card image"
+                    value={field.value}
+                    onChange={field.onChange}
+                    folder="services"
+                    placeholder="/services/cybersecurity-visual.svg"
+                  />
+                )}
+              />
+            )}
+            {key === "cybersecurity" && (
+              <label>
+                Key features (one per line)
+                <textarea
+                  rows={4}
+                  {...register(`${key}.featuresLines`)}
+                  placeholder={"Zero Trust Architecture\n24/7 SIEM/SOC Monitoring\nVulnerability Management"}
+                />
+              </label>
+            )}
+            {key === "software" && (
+              <div className="admin-section-group">
+                <h5>Feature groups</h5>
+                <p className="admin-field-hint" style={{ marginTop: 0 }}>
+                  Two columns shown on the software card: a process group and a stack group.
+                </p>
+                <label>
+                  Group 1 label
+                  <input
+                    {...register(`${key}.featureGroup1Label`)}
+                    placeholder="PROCESS"
+                  />
+                </label>
+                <label>
+                  Group 1 items (one per line)
+                  <textarea
+                    rows={4}
+                    {...register(`${key}.featureGroup1ItemsLines`)}
+                    placeholder={"Agile Methodologies\nDevOps Integration\nMicroservices Architecture"}
+                  />
+                </label>
+                <label>
+                  Group 2 label
+                  <input
+                    {...register(`${key}.featureGroup2Label`)}
+                    placeholder="STACK"
+                  />
+                </label>
+                <label>
+                  Group 2 items (one per line)
+                  <textarea
+                    rows={4}
+                    {...register(`${key}.featureGroup2ItemsLines`)}
+                    placeholder={".NET / Java Core\nReact / Next.js\nDocker / Kubernetes"}
+                  />
+                </label>
+              </div>
+            )}
+            {(key === "cybersecurity" || key === "cloud" || key === "data") && (
+              <label>
+                Tags (one per line)
+                <textarea rows={3} {...register(`${key}.tagsLines`)} placeholder="Azure\nAWS\nGCP" />
+              </label>
+            )}
+            {key === "cybersecurity" && (
+              <label>
+                Tags label
+                <input {...register(`${key}.tagsLabel`)} placeholder="Tech Stack" />
+              </label>
+            )}
+            <label>
+              CTA label
+              <input {...register(`${key}.ctaLabel`)} />
             </label>
             <label>
-              Icon token
-              <input
-                {...register(`cards.${index}.icon`, {
-                  required: "Icon token is required",
-                })}
-                placeholder="security"
-              />
+              CTA link
+              <input {...register(`${key}.ctaHref`)} />
             </label>
-            <button
-              type="button"
-              onClick={() => remove(index)}
-              disabled={fields.length === 1}
-            >
-              Remove card
-            </button>
           </div>
         ))}
-
-        <button
-          type="button"
-          className="admin-button-secondary"
-          onClick={() =>
-            append({
-              category: "",
-              title: "",
-              description: "",
-              featuresLines: "",
-              icon: "security",
-            })
-          }
-        >
-          Add card
-        </button>
       </div>
 
       <SectionSaveFooter
@@ -1010,10 +1101,7 @@ export function WhyChooseSectionForm({
         icon: item.icon,
         title: item.title,
         description: item.description,
-        tags: item.tags
-          .split(",")
-          .map((tag) => tag.trim())
-          .filter(Boolean),
+        tags: [],
       })),
     });
   }
@@ -1031,15 +1119,19 @@ export function WhyChooseSectionForm({
       <SectionHeading section={section} />
       <label>
         Title
-        <input {...register("title")} placeholder="(Optional) Leave blank to hide header" />
+        <input {...register("title")} placeholder="The Technology Ecosystem" />
       </label>
       <label>
-        Subheading
-        <input {...register("subheading")} placeholder="(Optional) Leave blank to hide subheading" />
+        Intro paragraph
+        <textarea
+          rows={3}
+          {...register("subheading")}
+          placeholder="Our solutions aren't silos; they are interconnected nodes..."
+        />
       </label>
 
       <div>
-        <h4>Items</h4>
+        <h4>Points</h4>
         {fields.map((field, index) => (
           <div
             key={field.id}
@@ -1071,19 +1163,12 @@ export function WhyChooseSectionForm({
               Title
               <input
                 {...register(`items.${index}.title`, { required: true })}
-                placeholder="END-TO-END SECURITY"
+                placeholder="Licensed Excellence"
               />
             </label>
             <label>
               Description
-              <textarea rows={3} {...register(`items.${index}.description`)} placeholder="Security-first description text" />
-            </label>
-            <label>
-              Tags (comma-separated)
-              <input
-                {...register(`items.${index}.tags`)}
-                placeholder="ENCRYPTION, ZERO TRUST, QUANTUM CONTROL"
-              />
+              <textarea rows={3} {...register(`items.${index}.description`)} placeholder="Point description" />
             </label>
             <button
               type="button"
@@ -2899,17 +2984,23 @@ function toIndustriesHeroDefaultValues(
   };
 }
 type ServicesHeroFormValues = {
-  titleLines: string;
+  eyebrow: string;
+  title: string;
   description: string;
+  backgroundImage: string;
 };
 function toServicesHeroDefaultValues(
   data: Record<string, unknown>,
 ): ServicesHeroFormValues {
+  const title = Array.isArray(data.title)
+    ? (data.title as string[]).join(" ")
+    : ((data.title as string) ?? "Our Services");
+
   return {
-    titleLines: Array.isArray(data.title)
-      ? (data.title as string[]).join("\n")
-      : "",
+    eyebrow: (data.eyebrow as string) ?? "STRATEGIC TECHNOLOGY PARTNER",
+    title,
     description: (data.description as string) ?? "",
+    backgroundImage: (data.backgroundImage as string) ?? "",
   };
 }
 export function ServicesHeroSectionForm({
@@ -2925,17 +3016,19 @@ export function ServicesHeroSectionForm({
   );
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ServicesHeroFormValues>({ defaultValues });
 
   function handleValid(values: ServicesHeroFormValues) {
     onSave({
-      title: values.titleLines
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean),
+      eyebrow: values.eyebrow,
+      title: values.title,
       description: values.description,
+      ...(values.backgroundImage.trim()
+        ? { backgroundImage: values.backgroundImage.trim() }
+        : {}),
     });
   }
   return (
@@ -2951,13 +3044,18 @@ export function ServicesHeroSectionForm({
       <SectionHeading section={section} />
 
       <label>
-        Title lines (one per line)
-        <textarea
-          rows={4}
-          {...register("titleLines", { required: "Title is required" })}
-        />
-        {errors.titleLines ? (
-          <p className="admin-field-error">{errors.titleLines.message}</p>
+        Eyebrow
+        <input {...register("eyebrow", { required: "Eyebrow is required" })} />
+        {errors.eyebrow ? (
+          <p className="admin-field-error">{errors.eyebrow.message}</p>
+        ) : null}
+      </label>
+
+      <label>
+        Title
+        <input {...register("title", { required: "Title is required" })} />
+        {errors.title ? (
+          <p className="admin-field-error">{errors.title.message}</p>
         ) : null}
       </label>
 
@@ -2971,6 +3069,20 @@ export function ServicesHeroSectionForm({
           <p className="admin-field-error">{errors.description.message}</p>
         ) : null}
       </label>
+
+      <Controller
+        control={control}
+        name="backgroundImage"
+        render={({ field }) => (
+          <ImageUploadField
+            label="Background image (optional)"
+            value={field.value}
+            onChange={field.onChange}
+            folder="services"
+            placeholder="Leave empty to use the default gradient"
+          />
+        )}
+      />
 
       {/* <label>
         Supporting stat
@@ -3675,7 +3787,7 @@ type ContactInquiryFormValues = {
   disclaimerText: string;
   successMessage: string;
   errorMessage: string;
-  mapImage: string;
+  mapEmbedUrl: string;
   mapLabelTitle: string;
   mapLabelSubtitle: string;
 };
@@ -3683,28 +3795,29 @@ type ContactInquiryFormValues = {
 function toContactInquiryDefaultValues(
   data: Record<string, unknown>,
 ): ContactInquiryFormValues {
+  const defaults = CONTACT_INQUIRY_SECTION_DEFAULT;
   const rawItems = Array.isArray(data.officeItems)
     ? (data.officeItems as Record<string, unknown>[])
     : [];
-  const formFields = (data.formFields as Record<string, unknown>) ?? {};
+  const formFields =
+    (data.formFields as Record<string, unknown> | undefined) ??
+    (defaults.formFields as Record<string, unknown>);
   const heroTitleLines = Array.isArray(data.heroTitleLines)
     ? (data.heroTitleLines as string[])
-    : [];
+    : defaults.heroTitleLines;
 
   return {
-    heroEyebrow: (data.heroEyebrow as string) ?? "PROTOCOL: COMMUNICATION",
+    heroEyebrow: (data.heroEyebrow as string) ?? "",
     heroTitleLinesText:
-      heroTitleLines.length > 0 ? heroTitleLines.join("\n") : "CONNECT\nSECURELY",
-    heroSideCopy:
-      (data.heroSideCopy as string) ??
-      "ENTERPRISE-GRADE COMMUNICATION NODES FOR INDUSTRIAL SCALING AND TECHNOLOGICAL SOVEREIGNTY.",
-    formTitle: (data.formTitle as string) ?? "",
-    formDescription: (data.formDescription as string) ?? "",
-    submitLabel: (data.submitLabel as string) ?? "",
+      heroTitleLines.length > 0 ? heroTitleLines.join("\n") : defaults.heroTitleLines.join("\n"),
+    heroSideCopy: (data.heroSideCopy as string) ?? defaults.heroSideCopy,
+    formTitle: (data.formTitle as string) ?? defaults.formTitle,
+    formDescription: (data.formDescription as string) ?? defaults.formDescription,
+    submitLabel: (data.submitLabel as string) ?? defaults.submitLabel,
     inquiryOptionsText: Array.isArray(data.inquiryOptions)
       ? (data.inquiryOptions as string[]).join("\n")
-      : "",
-    officeHeading: (data.officeHeading as string) ?? "",
+      : defaults.inquiryOptions.join("\n"),
+    officeHeading: (data.officeHeading as string) ?? defaults.officeHeading,
     officeItems:
       rawItems.length > 0
         ? rawItems.map((item) => ({
@@ -3714,29 +3827,31 @@ function toContactInquiryDefaultValues(
               : "",
             icon: (item.icon as string) ?? "",
           }))
-        : [{ title: "", linesText: "", icon: "location" }],
-    fullNameLabel: (formFields.fullNameLabel as string) ?? "Identifier / Name",
-    fullNamePlaceholder: (formFields.fullNamePlaceholder as string) ?? "ENTER FULL NAME",
-    companyLabel: (formFields.companyLabel as string) ?? "Organization / Company",
-    companyPlaceholder: (formFields.companyPlaceholder as string) ?? "ENTER COMPANY NAME",
-    workEmailLabel: (formFields.workEmailLabel as string) ?? "Secure Email Endpoint",
-    workEmailPlaceholder: (formFields.workEmailPlaceholder as string) ?? "EMAIL@DOMAIN.COM",
-    interestLabel: (formFields.interestLabel as string) ?? "Operation Type / Service",
-    interestPlaceholder:
-      (formFields.interestPlaceholder as string) ?? "SELECT INFRASTRUCTURE MODULE",
-    messageLabel: (formFields.messageLabel as string) ?? "Message Payload",
+        : defaults.officeItems.map((item) => ({
+            title: item.title,
+            linesText: item.lines.join("\n"),
+            icon: item.icon,
+          })),
+    fullNameLabel: (formFields.fullNameLabel as string) ?? defaults.formFields.fullNameLabel,
+    fullNamePlaceholder:
+      (formFields.fullNamePlaceholder as string) ?? defaults.formFields.fullNamePlaceholder,
+    companyLabel: (formFields.companyLabel as string) ?? defaults.formFields.companyLabel,
+    companyPlaceholder:
+      (formFields.companyPlaceholder as string) ?? defaults.formFields.companyPlaceholder,
+    workEmailLabel: (formFields.workEmailLabel as string) ?? defaults.formFields.workEmailLabel,
+    workEmailPlaceholder:
+      (formFields.workEmailPlaceholder as string) ?? defaults.formFields.workEmailPlaceholder,
+    interestLabel: (formFields.interestLabel as string) ?? defaults.formFields.interestLabel,
+    interestPlaceholder: (formFields.interestPlaceholder as string) ?? "",
+    messageLabel: (formFields.messageLabel as string) ?? defaults.formFields.messageLabel,
     messagePlaceholder:
-      (formFields.messagePlaceholder as string) ?? "TRANSMIT YOUR REQUIREMENTS...",
-    disclaimerText:
-      (formFields.disclaimerText as string) ??
-      "By submitting this form, you agree to our privacy policy and data handling terms.",
-    successMessage:
-      (formFields.successMessage as string) ??
-      "Thank you — our consultants will be in touch shortly.",
-    errorMessage: (formFields.errorMessage as string) ?? "Network error",
-    mapImage: (data.mapImage as string) ?? "/home/hero-bg.jpg",
-    mapLabelTitle: (data.mapLabelTitle as string) ?? "ADAM HQ DUBAI",
-    mapLabelSubtitle: (data.mapLabelSubtitle as string) ?? "",
+      (formFields.messagePlaceholder as string) ?? defaults.formFields.messagePlaceholder,
+    disclaimerText: (formFields.disclaimerText as string) ?? defaults.formFields.disclaimerText,
+    successMessage: (formFields.successMessage as string) ?? defaults.formFields.successMessage,
+    errorMessage: (formFields.errorMessage as string) ?? defaults.formFields.errorMessage,
+    mapEmbedUrl: (data.mapEmbedUrl as string) ?? defaults.mapEmbedUrl,
+    mapLabelTitle: (data.mapLabelTitle as string) ?? defaults.mapLabelTitle,
+    mapLabelSubtitle: (data.mapLabelSubtitle as string) ?? defaults.mapLabelSubtitle,
   };
 }
 
@@ -3755,15 +3870,12 @@ export function ContactInquirySectionForm({
     register,
     control,
     handleSubmit,
-    watch,
-    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ContactInquiryFormValues>({ defaultValues });
   const { fields, append, remove } = useFieldArray({
     control,
     name: "officeItems",
   });
-  const mapImage = watch("mapImage");
 
   function handleValid(values: ContactInquiryFormValues) {
     onSave({
@@ -3804,7 +3916,7 @@ export function ContactInquirySectionForm({
         successMessage: values.successMessage.trim(),
         errorMessage: values.errorMessage.trim(),
       },
-      mapImage: values.mapImage.trim(),
+      mapEmbedUrl: values.mapEmbedUrl.trim() || undefined,
       mapLabelTitle: values.mapLabelTitle.trim(),
       mapLabelSubtitle: values.mapLabelSubtitle.trim(),
     });
@@ -3892,13 +4004,14 @@ export function ContactInquirySectionForm({
       </label>
 
       <label>
-        Inquiry options (one per line)
+        Interest areas (one per line)
         <textarea
           rows={5}
           {...register("inquiryOptionsText", {
-            required: "At least one option is required",
+            required: "At least one interest area is required",
           })}
         />
+        <FieldHint>Each line becomes an option in the Interest Area dropdown on the contact form.</FieldHint>
         {errors.inquiryOptionsText ? (
           <p className="admin-field-error">
             {errors.inquiryOptionsText.message}
@@ -3975,28 +4088,17 @@ export function ContactInquirySectionForm({
       </div>
 
       <div className="admin-section-group">
-        <h4>Visual tile</h4>
-        <input
-          type="hidden"
-          {...register("mapImage", {
-            required: "Visual tile image URL is required",
-          })}
-        />
-        <ImageUploadField
-          label="Visual tile image URL"
-          value={mapImage}
-          onChange={(value) =>
-            setValue("mapImage", value, {
-              shouldDirty: true,
-              shouldValidate: true,
-            })
-          }
-          folder={`sections/${section.type}`}
-          placeholder="/sections/contact/map-image.webp"
-        />
-        {errors.mapImage ? (
-          <p className="admin-field-error">{errors.mapImage.message}</p>
-        ) : null}
+        <h4>Office map</h4>
+        <label>
+          Map embed URL (optional)
+          <input
+            {...register("mapEmbedUrl")}
+            placeholder="Leave blank to auto-generate from office address"
+          />
+          <FieldHint>
+            Uses Google Maps centered on the office address when left empty.
+          </FieldHint>
+        </label>
 
         <label>
           Label title
@@ -4024,8 +4126,8 @@ export function ContactInquirySectionForm({
         <label>Company placeholder<input {...register("companyPlaceholder", { required: true })} /></label>
         <label>Work email label<input {...register("workEmailLabel", { required: true })} /></label>
         <label>Work email placeholder<input {...register("workEmailPlaceholder", { required: true })} /></label>
-        <label>Primary interest label<input {...register("interestLabel", { required: true })} /></label>
-        <label>Primary interest placeholder<input {...register("interestPlaceholder", { required: true })} /></label>
+        <label>Interest area label<input {...register("interestLabel", { required: true })} /></label>
+        <label>Interest area placeholder<input {...register("interestPlaceholder", { required: true })} /></label>
         <label>Message label<input {...register("messageLabel", { required: true })} /></label>
         <label>Message placeholder<input {...register("messagePlaceholder", { required: true })} /></label>
         <label>Disclaimer text<textarea rows={3} {...register("disclaimerText", { required: true })} /></label>
@@ -4044,8 +4146,7 @@ export function ContactInquirySectionForm({
 }
 
 type AboutHeroFormValues = {
-  titleAccent: string;
-  titleMain: string;
+  titleLines: string;
   description: string;
   image: string;
   stat1Value: string;
@@ -4057,9 +4158,12 @@ type AboutHeroFormValues = {
 function toAboutHeroDefaultValues(
   data: Record<string, unknown>,
 ): AboutHeroFormValues {
+  const titleAccent = (data.titleAccent as string) ?? "";
+  const titleMain = (data.titleMain as string) ?? "";
+  const titleLines = [titleAccent, titleMain].filter(Boolean).join("\n");
+
   return {
-    titleAccent: (data.titleAccent as string) ?? "",
-    titleMain: (data.titleMain as string) ?? "",
+    titleLines,
     description: (data.description as string) ?? "",
     image: ((data.image as string) ?? (data.backgroundImage as string) ?? ""),
     stat1Value: Array.isArray(data.stats)
@@ -4100,11 +4204,17 @@ export function AboutHeroSectionForm({
   const image = useWatch({ control, name: "image" });
 
   function handleValid(values: AboutHeroFormValues) {
+    const lines = values.titleLines
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+
     onSave({
-      titleAccent: values.titleAccent,
-      titleMain: values.titleMain,
+      titleAccent: lines.length > 1 ? lines[0] : "",
+      titleMain: lines.length > 1 ? lines.slice(1).join(" ") : lines[0] ?? "",
       description: values.description,
       image: values.image,
+      backgroundImage: values.image,
       stats: [
         { value: values.stat1Value, label: values.stat1Label },
         { value: values.stat2Value, label: values.stat2Label },
@@ -4124,29 +4234,18 @@ export function AboutHeroSectionForm({
     >
       <SectionHeading section={section} />
 
-      {/* Title Accent */}
       <label>
-        Title Accent
-        <input
-          {...register("titleAccent", {
-            required: "Title accent is required",
+        Title (one line per line — first line accent, second line main)
+        <textarea
+          rows={2}
+          {...register("titleLines", {
+            required: "Title is required",
           })}
+          placeholder={"The Digital\nArchitect"}
         />
-        {errors.titleAccent ? (
-          <p className="admin-field-error">{errors.titleAccent.message}</p>
-        ) : null}
-      </label>
-
-      {/* Title Main */}
-      <label>
-        Title Main
-        <input
-          {...register("titleMain", {
-            required: "Title main is required",
-          })}
-        />
-        {errors.titleMain ? (
-          <p className="admin-field-error">{errors.titleMain.message}</p>
+        <FieldHint>The first line uses accent styling; the second line uses the main title styling.</FieldHint>
+        {errors.titleLines ? (
+          <p className="admin-field-error">{errors.titleLines.message}</p>
         ) : null}
       </label>
 
@@ -4655,64 +4754,47 @@ type AboutVisionMissionCardFormValue = {
 };
 
 type AboutVisionMissionFormValues = {
+  overviewTitle: string;
+  overviewDescription: string;
+  overviewImage: string;
   items: AboutVisionMissionCardFormValue[];
-  visionTitle: string;
-  visionQuote: string;
-  visionBadge: string;
-  visionActionLabel: string;
-  visionActionHref: string;
 };
 
 function toAboutVisionMissionDefaultValues(
   data: Record<string, unknown>,
 ): AboutVisionMissionFormValues {
+  const defaults = ABOUT_VISION_MISSION_SECTION_DEFAULT;
   const rawItems = Array.isArray(data.items)
     ? (data.items as Record<string, unknown>[])
     : Array.isArray(data.cards)
       ? (data.cards as Record<string, unknown>[])
       : [];
+  const overview = (data.overview as Record<string, unknown> | undefined) ?? defaults.overview;
+  const defaultItems = defaults.items.map((item) => ({
+    title: item.title,
+    description: item.description,
+    icon: item.icon ?? "",
+    iconImage: "",
+    accentColor: item.accentColor,
+  }));
 
   return {
+    overviewTitle: (overview.title as string) ?? defaults.overview.title,
+    overviewDescription: joinOverviewDescription(
+      overview.description as string | undefined,
+      overview.subDescription as string | undefined,
+    ),
+    overviewImage: (overview.image as string) ?? defaults.overview.image,
     items:
       rawItems.length > 0
-        ? rawItems.map((item) => ({
+        ? rawItems.slice(0, 2).map((item) => ({
             title: (item.title as string) ?? "",
             description: (item.description as string) ?? "",
             icon: (item.icon as string) ?? "",
             iconImage: (item.iconImage as string) ?? "",
-            accentColor: (item.accentColor as string) ?? "#0b3d91",
+            accentColor: (item.accentColor as string) ?? "#191d24",
           }))
-        : [
-            {
-              title: "Our Mission",
-              description: "",
-              icon: "Zap",
-              iconImage: "",
-              accentColor: "#0b3d91",
-            },
-            {
-              title: "Our Vision",
-              description: "",
-              icon: "Eye",
-              iconImage: "",
-              accentColor: "#c8a96a",
-            },
-          ],
-    visionTitle:
-      ((data.vision as Record<string, unknown> | undefined)?.title as string) ??
-      "VISION 2030",
-    visionQuote:
-      ((data.vision as Record<string, unknown> | undefined)?.quote as string) ??
-      "",
-    visionBadge:
-      ((data.vision as Record<string, unknown> | undefined)?.badge as string) ??
-      "PROTOCOL ACTIVE",
-    visionActionLabel:
-      (((data.vision as Record<string, unknown> | undefined)?.action as Record<string, unknown> | undefined)?.label as string) ??
-      "",
-    visionActionHref:
-      (((data.vision as Record<string, unknown> | undefined)?.action as Record<string, unknown> | undefined)?.href as string) ??
-      "",
+        : defaultItems,
   };
 }
 
@@ -4734,30 +4816,26 @@ export function AboutVisionMissionSectionForm({
     handleSubmit,
     formState: { isSubmitting },
   } = useForm<AboutVisionMissionFormValues>({ defaultValues });
-  const { fields, append, remove } = useFieldArray({ control, name: "items" });
+  const { fields } = useFieldArray({ control, name: "items" });
   const items = useWatch({ control, name: "items" });
+  const overviewImage = useWatch({ control, name: "overviewImage" });
 
   function handleValid(values: AboutVisionMissionFormValues) {
+    const overviewCopy = splitOverviewDescription(values.overviewDescription);
     onSave({
-      items: values.items.map((item) => ({
+      overview: {
+        title: values.overviewTitle,
+        description: overviewCopy.description,
+        subDescription: overviewCopy.subDescription,
+        image: values.overviewImage,
+      },
+      items: values.items.slice(0, 2).map((item) => ({
         title: item.title,
         description: item.description,
         icon: item.icon || undefined,
         iconImage: item.iconImage || undefined,
         accentColor: item.accentColor,
       })),
-      vision: {
-        title: values.visionTitle,
-        quote: values.visionQuote,
-        badge: values.visionBadge,
-        action:
-          values.visionActionLabel.trim() && values.visionActionHref.trim()
-            ? {
-                label: values.visionActionLabel.trim(),
-                href: values.visionActionHref.trim(),
-              }
-            : undefined,
-      },
     });
   }
 
@@ -4773,53 +4851,31 @@ export function AboutVisionMissionSectionForm({
     >
       <SectionHeading section={section} />
 
+      <div className="admin-section-group">
+        <h4>Company overview</h4>
+        <label>
+          Overview title
+          <input {...register("overviewTitle", { required: "Overview title is required" })} />
+        </label>
+        <label>
+          Overview description
+          <textarea rows={5} {...register("overviewDescription", { required: "Overview description is required" })} />
+        </label>
+        <input type="hidden" {...register("overviewImage", { required: "Overview image is required" })} />
+        <ImageUploadField
+          label="Overview image URL"
+          value={overviewImage}
+          onChange={(value) =>
+            setValue("overviewImage", value, { shouldDirty: true, shouldValidate: true })
+          }
+          folder={`sections/${section.type}/overview`}
+        />
+      </div>
+
       <div>
-        <h4>Mission and Vision Cards</h4>
+        <h4>Mission and vision panels</h4>
 
-        <div className="admin-section-group">
-          <h4>Vision 2030 block</h4>
-          <label>
-            Vision title
-            <input
-              {...register("visionTitle", {
-                required: "Vision title is required",
-              })}
-            />
-          </label>
-          <label>
-            Vision quote
-            <textarea
-              rows={4}
-              {...register("visionQuote", {
-                required: "Vision quote is required",
-              })}
-            />
-          </label>
-          <label>
-            Vision badge text
-            <input
-              {...register("visionBadge", {
-                required: "Vision badge is required",
-              })}
-            />
-          </label>
-          <label>
-            Vision button label (optional)
-            <input
-              {...register("visionActionLabel")}
-              placeholder="DOWNLOAD REPORT"
-            />
-          </label>
-          <label>
-            Vision button link (optional)
-            <input
-              {...register("visionActionHref")}
-              placeholder="/files/report.pdf"
-            />
-          </label>
-        </div>
-
-        {fields.map((field, index) => (
+        {fields.slice(0, 2).map((field, index) => (
           <div
             key={field.id}
             style={{
@@ -4830,77 +4886,22 @@ export function AboutVisionMissionSectionForm({
             }}
           >
             <label>
-              Card Title
-              <input
-                {...register(`items.${index}.title`, { required: true })}
-              />
+              Panel title
+              <input {...register(`items.${index}.title`, { required: true })} />
             </label>
             <label>
               Description
-              <textarea
-                rows={4}
-                {...register(`items.${index}.description`, { required: true })}
-              />
+              <textarea rows={4} {...register(`items.${index}.description`, { required: true })} />
             </label>
-            <label>
-              Choose Icon
-              <Controller
-                control={control}
-                name={`items.${index}.icon`}
-                render={({ field }) => (
-                  <IconPicker
-                    value={typeof field.value === "string" ? field.value : ""}
-                    onChange={(val) =>
-                      field.onChange(typeof val === "string" ? val : "")
-                    }
-                  />
-                )}
-              />
-            </label>
-            {/* <input type="hidden" {...register(`cards.${index}.iconImage`)} />
-            <ImageUploadField
-              label="Custom icon image URL"
-              value={cards?.[index]?.iconImage ?? ""}
-              onChange={(value) =>
-                setValue(`cards.${index}.iconImage`, value, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                })
-              }
-              folder={`sections/${section.type}/icons`}
-            /> */}
             <label>
               Accent color
               <input
                 {...register(`items.${index}.accentColor`, { required: true })}
-                placeholder="#0b3d91"
+                placeholder={index === 0 ? "#191d24" : "#6385cf"}
               />
             </label>
-            <button
-              type="button"
-              onClick={() => remove(index)}
-              disabled={fields.length <= 2}
-            >
-              Remove card
-            </button>
           </div>
         ))}
-        <button
-          type="button"
-          className="admin-button-secondary"
-          disabled={fields.length >= 2}
-          onClick={() =>
-            append({
-              title: "",
-              description: "",
-              icon: "",
-              iconImage: "",
-              accentColor: "#0b3d91",
-            })
-          }
-        >
-          Add card
-        </button>
       </div>
 
       <SectionSaveFooter
@@ -5046,27 +5047,56 @@ export function AboutFrameworkSectionForm({
   );
 }
 
-type AboutAdvantageFormValues = {
-  eyebrow: string;
-  titleLines: string;
+type AboutAdvantageItemFormValue = {
+  title: string;
   description: string;
-  pointsLines: string;
-  image: string;
+  icon: string;
+};
+
+type AboutAdvantageFormValues = {
+  title: string;
+  description: string;
+  items: AboutAdvantageItemFormValue[];
 };
 
 function toAboutAdvantageDefaultValues(
   data: Record<string, unknown>,
 ): AboutAdvantageFormValues {
+  const rawItems = Array.isArray(data.items)
+    ? (data.items as Record<string, unknown>[])
+    : [];
+
+  if (rawItems.length > 0) {
+    return {
+      title: typeof data.title === "string" ? data.title : "Why Choose Adam Technology?",
+      description: (data.description as string) ?? "",
+      items: rawItems.map((item) => ({
+        title: (item.title as string) ?? "",
+        description: (item.description as string) ?? "",
+        icon: (item.icon as string) ?? "shieldCheck",
+      })),
+    };
+  }
+
+  const legacyPoints = Array.isArray(data.points) ? (data.points as string[]) : [];
+
   return {
-    eyebrow: (data.eyebrow as string) ?? "",
-    titleLines: Array.isArray(data.title)
-      ? (data.title as string[]).join("\n")
-      : "",
+    title: Array.isArray(data.title)
+      ? (data.title as string[]).join(" ")
+      : ((data.title as string) ?? "Why Choose Adam Technology?"),
     description: (data.description as string) ?? "",
-    pointsLines: Array.isArray(data.points)
-      ? (data.points as string[]).join("\n")
-      : "",
-    image: (data.image as string) ?? "",
+    items:
+      legacyPoints.length > 0
+        ? legacyPoints.map((point, index) => ({
+            title: `Advantage ${index + 1}`,
+            description: point,
+            icon: "shieldCheck",
+          }))
+        : ABOUT_ADVANTAGE_SECTION_DEFAULT.items.map((item) => ({
+            title: item.title,
+            description: item.description,
+            icon: item.icon,
+          })),
   };
 }
 
@@ -5084,25 +5114,20 @@ export function AboutAdvantageSectionForm({
   const {
     register,
     control,
-    setValue,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<AboutAdvantageFormValues>({ defaultValues });
-  const image = useWatch({ control, name: "image" });
+  const { fields, append, remove } = useFieldArray({ control, name: "items" });
 
   function handleValid(values: AboutAdvantageFormValues) {
     onSave({
-      eyebrow: values.eyebrow,
-      title: values.titleLines
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean),
+      title: values.title,
       description: values.description,
-      points: values.pointsLines
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean),
-      image: values.image,
+      items: values.items.map((item) => ({
+        title: item.title,
+        description: item.description,
+        icon: item.icon || "shieldCheck",
+      })),
     });
   }
 
@@ -5119,63 +5144,69 @@ export function AboutAdvantageSectionForm({
       <SectionHeading section={section} />
 
       <label>
-        Eyebrow
-        <input {...register("eyebrow", { required: "Eyebrow is required" })} />
-        {errors.eyebrow ? (
-          <p className="admin-field-error">{errors.eyebrow.message}</p>
-        ) : null}
+        Section title
+        <input {...register("title", { required: "Title is required" })} />
+        {errors.title ? <p className="admin-field-error">{errors.title.message}</p> : null}
       </label>
 
       <label>
-        Title lines (one per line)
-        <textarea
-          rows={4}
-          {...register("titleLines", { required: "Title is required" })}
-        />
-        {errors.titleLines ? (
-          <p className="admin-field-error">{errors.titleLines.message}</p>
-        ) : null}
-      </label>
-
-      <label>
-        Description
-        <textarea
-          rows={4}
-          {...register("description", { required: "Description is required" })}
-        />
+        Section description
+        <textarea rows={3} {...register("description", { required: "Description is required" })} />
         {errors.description ? (
           <p className="admin-field-error">{errors.description.message}</p>
         ) : null}
       </label>
 
-      <label>
-        Bullet points (one per line)
-        <textarea
-          rows={4}
-          {...register("pointsLines", {
-            required: "At least one point is required",
-          })}
-        />
-        {errors.pointsLines ? (
-          <p className="admin-field-error">{errors.pointsLines.message}</p>
-        ) : null}
-      </label>
-
-      <input
-        type="hidden"
-        {...register("image", { required: "Image is required" })}
-      />
-      <ImageUploadField
-        label="Image URL"
-        value={image}
-        onChange={(value) =>
-          setValue("image", value, { shouldDirty: true, shouldValidate: true })
-        }
-        folder={`sections/${section.type}`}
-      />
-      {errors.image ? (
-        <p className="admin-field-error">{errors.image.message}</p>
-      ) : null}
+      <div>
+        <h4>Why choose cards</h4>
+        {fields.map((field, index) => (
+          <div
+            key={field.id}
+            style={{
+              marginBottom: 16,
+              padding: 16,
+              border: "1px solid #e2e8f0",
+              borderRadius: 12,
+            }}
+          >
+            <label>
+              Card title
+              <input {...register(`items.${index}.title`, { required: true })} />
+            </label>
+            <label>
+              Card description
+              <textarea rows={3} {...register(`items.${index}.description`, { required: true })} />
+            </label>
+            <label>
+              Icon
+              <Controller
+                control={control}
+                name={`items.${index}.icon`}
+                render={({ field: iconField }) => (
+                  <IconPicker
+                    value={typeof iconField.value === "string" ? iconField.value : ""}
+                    onChange={(val) =>
+                      iconField.onChange(typeof val === "string" ? val : "shieldCheck")
+                    }
+                    options={ABOUT_ADVANTAGE_ICON_OPTIONS}
+                  />
+                )}
+              />
+              <FieldHint>Choose an icon that matches the about page card style.</FieldHint>
+            </label>
+            <button type="button" onClick={() => remove(index)} disabled={fields.length <= 1}>
+              Remove card
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          className="admin-button-secondary"
+          onClick={() => append({ title: "", description: "", icon: "shieldCheck" })}
+        >
+          Add card
+        </button>
+      </div>
 
       <SectionSaveFooter
         isSubmitting={isSubmitting}
@@ -5214,13 +5245,14 @@ type AboutValuesFormValues = {
 function toAboutValuesDefaultValues(
   data: Record<string, unknown>,
 ): AboutValuesFormValues {
+  const defaults = ABOUT_VALUES_SECTION_DEFAULT;
   const rawItems = Array.isArray(data.items)
     ? (data.items as Record<string, unknown>[])
     : [];
 
   return {
-    title: (data.title as string) ?? "",
-    description: (data.description as string) ?? "",
+    title: (data.title as string) ?? defaults.title,
+    description: (data.description as string) ?? defaults.description,
     region: (data.region as string) ?? "DUBAI, UNITED ARAB EMIRATES",
     reachTitle:
       ((data.reach as Record<string, unknown> | undefined)?.title as string) ??
@@ -5292,7 +5324,12 @@ function toAboutValuesDefaultValues(
             icon: (item.icon as string) ?? "",
             iconImage: (item.iconImage as string) ?? "",
           }))
-        : [{ title: "", description: "", icon: "", iconImage: "" }],
+        : defaults.items.map((item) => ({
+            title: item.title,
+            description: item.description,
+            icon: item.icon,
+            iconImage: "",
+          })),
   };
 }
 
@@ -5322,23 +5359,12 @@ export function AboutValuesSectionForm({
     onSave({
       title: values.title,
       description: values.description || undefined,
-      region: values.region,
       items: values.items.map((item) => ({
         title: item.title,
         description: item.description,
         icon: item.icon || undefined,
         iconImage: item.iconImage || undefined,
       })),
-      reach: {
-        title: values.reachTitle,
-        image: values.reachImage,
-        metrics: [
-          { value: values.reachMetric1Value, label: values.reachMetric1Label },
-          { value: values.reachMetric2Value, label: values.reachMetric2Label },
-          { value: values.reachMetric3Value, label: values.reachMetric3Label },
-          { value: values.reachMetric4Value, label: values.reachMetric4Label },
-        ],
-      },
     });
   }
 
@@ -5367,64 +5393,8 @@ export function AboutValuesSectionForm({
         <textarea rows={3} {...register("description")} />
       </label>
 
-      <label>
-        Region label
-        <input {...register("region", { required: "Region is required" })} />
-      </label>
-
       <div>
-        <h4>Global reach block</h4>
-        <label>
-          Title
-          <input {...register("reachTitle", { required: true })} />
-        </label>
-        <input type="hidden" {...register("reachImage")} />
-        <ImageUploadField
-          label="Image URL"
-          value={reachImage}
-          onChange={(value) =>
-            setValue("reachImage", value, { shouldDirty: true, shouldValidate: true })
-          }
-          folder={`sections/${section.type}/reach`}
-        />
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <label>
-            Metric 1 value
-            <input {...register("reachMetric1Value", { required: true })} />
-          </label>
-          <label>
-            Metric 1 label
-            <input {...register("reachMetric1Label", { required: true })} />
-          </label>
-          <label>
-            Metric 2 value
-            <input {...register("reachMetric2Value", { required: true })} />
-          </label>
-          <label>
-            Metric 2 label
-            <input {...register("reachMetric2Label", { required: true })} />
-          </label>
-          <label>
-            Metric 3 value
-            <input {...register("reachMetric3Value", { required: true })} />
-          </label>
-          <label>
-            Metric 3 label
-            <input {...register("reachMetric3Label", { required: true })} />
-          </label>
-          <label>
-            Metric 4 value
-            <input {...register("reachMetric4Value", { required: true })} />
-          </label>
-          <label>
-            Metric 4 label
-            <input {...register("reachMetric4Label", { required: true })} />
-          </label>
-        </div>
-      </div>
-
-      <div>
-        <h4>Value cards</h4>
+        <h4>Core value cards</h4>
         {fields.map((field, index) => (
           <div
             key={field.id}
@@ -5457,11 +5427,13 @@ export function AboutValuesSectionForm({
                   <IconPicker
                     value={typeof field.value === "string" ? field.value : ""}
                     onChange={(val) =>
-                      field.onChange(typeof val === "string" ? val : "")
+                      field.onChange(typeof val === "string" ? val : "lightbulb")
                     }
+                    options={ABOUT_VALUES_ICON_OPTIONS}
                   />
                 )}
               />
+              <FieldHint>Choose an icon that matches the about page card style.</FieldHint>
             </label>
             {/* <input type="hidden" {...register(`items.${index}.iconImage`)} />
             <ImageUploadField
@@ -5488,7 +5460,7 @@ export function AboutValuesSectionForm({
           type="button"
           className="admin-button-secondary"
           onClick={() =>
-            append({ title: "", description: "", icon: "", iconImage: "" })
+            append({ title: "", description: "", icon: "lightbulb", iconImage: "" })
           }
         >
           Add value

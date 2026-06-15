@@ -1,26 +1,60 @@
-﻿import type { z } from "zod";
+import type { z } from "zod";
 import type { aboutVisionMissionDataSchema } from "@/schemas/sections";
 
 type AboutVisionMissionContent = z.infer<typeof aboutVisionMissionDataSchema>;
+
+const DEFAULT_OVERVIEW = {
+  title: "COMPANY OVERVIEW",
+  description:
+    "Adam Technology LLC is a premier IT and cybersecurity solutions provider headquartered in Dubai, UAE. Licensed by the Department of Economy and Tourism, the company specializes in protecting digital assets and modernizing the technology infrastructure of modern enterprises.",
+  subDescription:
+    "The firm bridges the gap between complex emerging technologies—such as Blockchain and the Metaverse—and practical, secure enterprise operations.",
+  image: "/about/company-buildings.jpg",
+};
+
+function resolveOverviewCopy(overview: {
+  description?: string;
+  subDescription?: string;
+}) {
+  const subDescription = overview.subDescription?.trim() ?? "";
+  if (subDescription) {
+    return {
+      description: overview.description ?? DEFAULT_OVERVIEW.description,
+      subDescription,
+    };
+  }
+
+  const description = overview.description ?? DEFAULT_OVERVIEW.description;
+  const splitMarker = "The firm bridges";
+  const splitIndex = description.indexOf(splitMarker);
+  if (splitIndex === -1) {
+    return { description, subDescription: DEFAULT_OVERVIEW.subDescription };
+  }
+
+  return {
+    description: description.slice(0, splitIndex).trim(),
+    subDescription: description.slice(splitIndex).trim(),
+  };
+}
+
+function highlightMissionCopy(copy: string) {
+  const needle = "bulletproof infrastructure";
+  const idx = copy.toLowerCase().indexOf(needle);
+  if (idx === -1) return copy;
+  return (
+    <>
+      {copy.slice(0, idx)}
+      <span className="about-panel__accent">{copy.slice(idx, idx + needle.length)}</span>
+      {copy.slice(idx + needle.length)}
+    </>
+  );
+}
 
 export default function AboutVisionMissionSection({
   content,
 }: {
   content: AboutVisionMissionContent;
 }) {
-  function highlightMissionCopy(copy: string) {
-    const needle = "bulletproof infrastructure";
-    const idx = copy.toLowerCase().indexOf(needle);
-    if (idx === -1) return copy;
-    return (
-      <>
-        {copy.slice(0, idx)}
-        <span className="about-panel__accent">{copy.slice(idx, idx + needle.length)}</span>
-        {copy.slice(idx + needle.length)}
-      </>
-    );
-  }
-
   const legacyCards = (
     content as unknown as { cards?: Array<Record<string, unknown>> }
   ).cards;
@@ -36,25 +70,56 @@ export default function AboutVisionMissionSection({
           }))
         : [];
 
-  const mission = items[0] ?? { title: "MISSION", description: "" };
-  const objective = items[1] ?? { title: "OBJECTIVE", description: "" };
-  const vision = content.vision ?? {
-    eyebrow: "",
-    title: "VISION 2030",
-    quote:
-      '"A world where data is as structural and reliable as steel. We envision the total convergence of industrial engineering and digital protocol."',
-    badge: "PROTOCOL ACTIVE",
+  const extended = content as unknown as {
+    overview?: {
+      title?: string;
+      description?: string;
+      subDescription?: string;
+      image?: string;
+    };
   };
-  const visionAction =
-    (vision as unknown as { action?: { label?: string; href?: string } }).action ??
-    (content as unknown as { visionAction?: { label?: string; href?: string } }).visionAction;
-  const visionActionLabel = String(visionAction?.label ?? "").trim();
-  const visionActionHref = String(visionAction?.href ?? "").trim();
-  const shouldShowVisionAction = Boolean(visionActionLabel && visionActionHref);
+  const overview = {
+    ...DEFAULT_OVERVIEW,
+    ...extended.overview,
+  };
+  const overviewCopy = resolveOverviewCopy(overview);
+
+  const mission = items[0] ?? {
+    title: "MISSION",
+    description:
+      "To design and deploy bulletproof infrastructure that empowers the next generation of sovereign enterprise data. We don't just host; we architect resilience.",
+  };
+  const objective = items[1] ?? {
+    title: "VISION",
+    description:
+      "Securing the flow of global digital assets through hardware-first intelligence and cryptographical precision.",
+  };
 
   return (
     <section className="about-panels">
       <div className="section-shell">
+        <div className="about-company">
+          <div className="about-company__image-frame">
+            <img
+              className="about-company__image"
+              src={overview.image || DEFAULT_OVERVIEW.image}
+              alt=""
+              width={560}
+              height={390}
+              decoding="async"
+            />
+          </div>
+          <div className="about-company__copy">
+            <h2 className="about-company__title">{overview.title}</h2>
+            <p className="about-company__description">{overviewCopy.description}</p>
+            {overviewCopy.subDescription ? (
+              <p className="about-company__description about-company__description--secondary">
+                {overviewCopy.subDescription}
+              </p>
+            ) : null}
+          </div>
+        </div>
+
         <div className="about-panels__top">
           <article className="about-panel about-panel--mission">
             <h2 className="about-panel__title">{mission.title}</h2>
@@ -65,20 +130,6 @@ export default function AboutVisionMissionSection({
             <p className="about-panel__description">{objective.description}</p>
           </article>
         </div>
-
-        <article className="about-panels__vision">
-          <p className="about-panels__vision-icon" aria-hidden="true">◉</p>
-          <h3 className="about-panels__vision-title">{vision.title}</h3>
-          <p className="about-panels__vision-quote">{vision.quote}</p>
-          {shouldShowVisionAction ? (
-            <a className="about-panels__vision-action" href={visionActionHref}>
-              {visionActionLabel}
-            </a>
-          ) : null}
-          <p className="about-panels__vision-badge">
-            <span className="about-panels__vision-dot" aria-hidden="true" /> {vision.badge}
-          </p>
-        </article>
       </div>
     </section>
   );

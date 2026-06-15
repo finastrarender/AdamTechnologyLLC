@@ -4,16 +4,18 @@ import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import SectionSaveFooter from "@/components/admin/SectionSaveFooter";
+import { HERO_SECTION_DEFAULT } from "@/data/page-section-defaults";
 
 type HeroFormValues = {
   badge: string;
   titleLines: string;
   description: string;
+  highlightsLines: string;
   primaryLabel: string;
   primaryHref: string;
   secondaryLabel: string;
   secondaryHref: string;
-  backgroundImage: string;
+  visualImage: string;
 };
 
 type HeroSectionFormProps = {
@@ -30,17 +32,26 @@ function toDefaultValues(data: Record<string, unknown>): HeroFormValues {
   const description = (data.description as string) ?? "";
   const primary = (data.primaryAction as Record<string, unknown>) ?? {};
   const secondary = (data.secondaryAction as Record<string, unknown>) ?? {};
-  const backgroundImage = (data.backgroundImage as string) ?? "";
+  const visualImage =
+    (data.visualImage as string)?.trim() || HERO_SECTION_DEFAULT.visualImage;
+  const highlights = Array.isArray(data.highlights)
+    ? (data.highlights as string[])
+    : HERO_SECTION_DEFAULT.highlights;
 
   return {
     badge,
     titleLines: title.join("\n"),
     description,
-    primaryLabel: (primary.label as string) ?? "",
-    primaryHref: (primary.href as string) ?? "",
-    secondaryLabel: (secondary.label as string) ?? "",
-    secondaryHref: (secondary.href as string) ?? "",
-    backgroundImage,
+    highlightsLines: highlights.join("\n"),
+    primaryLabel:
+      (primary.label as string)?.trim() || HERO_SECTION_DEFAULT.primaryAction.label,
+    primaryHref:
+      (primary.href as string)?.trim() || HERO_SECTION_DEFAULT.primaryAction.href,
+    secondaryLabel:
+      (secondary.label as string)?.trim() || HERO_SECTION_DEFAULT.secondaryAction.label,
+    secondaryHref:
+      (secondary.href as string)?.trim() || HERO_SECTION_DEFAULT.secondaryAction.href,
+    visualImage,
   };
 }
 
@@ -62,18 +73,23 @@ export default function HeroSectionForm({
   } = useForm<HeroFormValues>({
     defaultValues,
   });
-  const backgroundImage = watch("backgroundImage");
+  const visualImage = watch("visualImage");
 
   function handleValid(values: HeroFormValues) {
     const titleArray = values.titleLines
       .split("\n")
       .map((line) => line.trim())
       .filter((line) => line.length > 0);
+    const highlights = values.highlightsLines
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
 
     const payload: Record<string, unknown> = {
       badge: values.badge,
       title: titleArray,
       description: values.description,
+      highlights,
       primaryAction: {
         label: values.primaryLabel,
         href: values.primaryHref,
@@ -82,7 +98,7 @@ export default function HeroSectionForm({
         label: values.secondaryLabel,
         href: values.secondaryHref,
       },
-      backgroundImage: values.backgroundImage,
+      visualImage: values.visualImage,
     };
 
     onSave(payload);
@@ -109,7 +125,7 @@ export default function HeroSectionForm({
         Badge (optional)
         <input
           {...register("badge")}
-          placeholder="ENTERPRISE GRADE INTELLIGENCE"
+          placeholder="DUBAI LICENSED TECHNOLOGY COMPANY"
         />
       </label>
 
@@ -135,21 +151,33 @@ export default function HeroSectionForm({
         ) : null}
       </label>
 
+      <label>
+        Feature points (one per line)
+        <textarea
+          rows={4}
+          {...register("highlightsLines")}
+          placeholder={"Licensed UAE Company\nEnterprise Security Solutions\nBlockchain & Cloud Experts"}
+        />
+      </label>
+
       <div className="hero-section-form__actions">
         <div>
-          <h4>Primary action</h4>
+          <h4>Primary button</h4>
+          <p className="admin-muted" style={{ marginTop: 0 }}>
+            Solid button shown first (reference: Schedule Consultation).
+          </p>
           <label>
-            Label
+            Button label
             <input
               {...register("primaryLabel", { required: "Primary label is required" })}
-              placeholder="EXPLORE SERVICES"
+              placeholder="Schedule Consultation"
             />
             {errors.primaryLabel ? (
               <p className="admin-field-error">{errors.primaryLabel.message}</p>
             ) : null}
           </label>
           <label>
-            Href
+            Button link (href)
             <input
               {...register("primaryHref", { required: "Primary href is required" })}
               placeholder="/contact"
@@ -159,46 +187,43 @@ export default function HeroSectionForm({
             ) : null}
           </label>
         </div>
-
         <div>
-          <h4>Secondary action</h4>
+          <h4>Secondary button</h4>
+          <p className="admin-muted" style={{ marginTop: 0 }}>
+            Outline button beside the primary (reference: Explore Services).
+          </p>
           <label>
-            Label
+            Button label
             <input
-              {...register("secondaryLabel", {
-                required: "Secondary label is required",
-              })}
-              placeholder="BOOK FREE ADVICE"
+              {...register("secondaryLabel")}
+              placeholder="Explore Services"
             />
-            {errors.secondaryLabel ? (
-              <p className="admin-field-error">{errors.secondaryLabel.message}</p>
-            ) : null}
           </label>
           <label>
-            Href
-            <input
-              {...register("secondaryHref", {
-                required: "Secondary href is required",
-              })}
-              placeholder="/contact"
-            />
-            {errors.secondaryHref ? (
-              <p className="admin-field-error">{errors.secondaryHref.message}</p>
-            ) : null}
+            Button link (href)
+            <input {...register("secondaryHref")} placeholder="/services" />
           </label>
         </div>
       </div>
 
-      <input type="hidden" {...register("backgroundImage", { required: "Background image is required" })} />
-      <ImageUploadField
-        label="Background image URL"
-        value={backgroundImage}
-        onChange={(value) => setValue("backgroundImage", value, { shouldDirty: true, shouldValidate: true })}
-        folder={`sections/${section.type}`}
-        placeholder="/home/hero-bg.jpg"
+      <input
+        type="hidden"
+        {...register("visualImage", { required: "Hand & globe image is required" })}
       />
-      {errors.backgroundImage ? (
-        <p className="admin-field-error">{errors.backgroundImage.message}</p>
+      <ImageUploadField
+        label="Hand & globe image"
+        value={visualImage}
+        onChange={(value) =>
+          setValue("visualImage", value, { shouldDirty: true, shouldValidate: true })
+        }
+        folder={`sections/${section.type}`}
+        placeholder="/home/hero-visual.png"
+      />
+      <p className="admin-muted" style={{ marginTop: "0.35rem" }}>
+        Robotic hand and digital globe shown on the right side of the hero.
+      </p>
+      {errors.visualImage ? (
+        <p className="admin-field-error">{errors.visualImage.message}</p>
       ) : null}
 
       <SectionSaveFooter

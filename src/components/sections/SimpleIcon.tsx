@@ -20,7 +20,14 @@ type IconName =
   | "shield"
   | "nodes"
   | "terminal"
-  | "sync";
+  | "sync"
+  | "globe"
+  | "handshake"
+  | "trophy"
+  | "cloud"
+  | "code"
+  | "chart"
+  | "headset";
 
 export default function SimpleIcon({
   name,
@@ -256,6 +263,76 @@ export default function SimpleIcon({
             stroke="currentColor"
             strokeWidth="1.6"
             strokeLinecap="round"
+          />
+        </svg>
+      );
+    case "globe":
+      return (
+        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm7.93 9h-3.18a15.6 15.6 0 0 0-1.12-4.32A8 8 0 0 1 19.93 11zM12 4c.95 1.57 1.66 3.42 2 5H10c.34-1.58 1.05-3.43 2-5zM8.37 6.68A15.6 15.6 0 0 0 7.25 11H4.07a8 8 0 0 1 4.3-4.32zM4.07 13h3.18a15.6 15.6 0 0 0 1.12 4.32A8 8 0 0 1 4.07 13zm5.3 6.32A15.6 15.6 0 0 0 10.5 13h3c-.34 1.58-1.05 3.43-2 5a15.6 15.6 0 0 0-2.23-1.68zM15.63 17.32A15.6 15.6 0 0 0 16.75 13h3.18a8 8 0 0 1-4.3 4.32zM16.75 11a15.6 15.6 0 0 0-1.12-4.32A8 8 0 0 1 19.93 11z"
+            fill="currentColor"
+          />
+        </svg>
+      );
+    case "handshake":
+      return (
+        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M11 11V7.5a1.5 1.5 0 0 1 3 0V9h2V7.5a3.5 3.5 0 0 0-7 0V11H5.5A1.5 1.5 0 0 0 4 12.5V14h16v-1.5A1.5 1.5 0 0 0 18.5 11H11zm-1 3.2 2.2 2.2 4.3-4.3 1.4 1.4-5.7 5.7-3.6-3.6 1.4-1.4z"
+            fill="currentColor"
+          />
+        </svg>
+      );
+    case "trophy":
+      return (
+        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M8 3h8v2a4 4 0 0 1-3 3.87V11h2v2H7v-2h2V8.87A4 4 0 0 1 8 5V3zm-3 2H3v1a3 3 0 0 0 2.82 3H5V5zm16 0h2v4h-.82A3 3 0 0 0 21 6V5h-2zM7 15h10v2H7v-2zm2 4h6v2H9v-2z"
+            fill="currentColor"
+          />
+        </svg>
+      );
+    case "cloud":
+      return (
+        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M6.5 19h11a4.5 4.5 0 0 0 .35-9A5.5 5.5 0 0 0 6.2 7.4 4.5 4.5 0 0 0 6.5 19z"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+    case "code":
+      return (
+        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M9 8 5 12l4 4M15 8l4 4-4 4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+    case "chart":
+      return (
+        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M3 17h2v-5H3v5zm4 0h2V7H7v10zm4 0h2v-3h-2v3zm4 0h2V4h-2v13zm4 0h2v-7h-2v7z"
+            fill="currentColor"
+          />
+        </svg>
+      );
+    case "headset":
+      return (
+        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 1a9 9 0 0 0-9 9v7c0 1.66 1.34 3 3 3h1v-8H5a7 7 0 0 1 14 0h-2v8h1c1.66 0 3-1.34 3-3v-7a9 9 0 0 0-9-9zm-3 17h6v2H9v-2z"
+            fill="currentColor"
           />
         </svg>
       );

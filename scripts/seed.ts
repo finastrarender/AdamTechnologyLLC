@@ -14,6 +14,27 @@ import { nanoid } from "nanoid";
 import User from "../src/models/User";
 import SiteGlobal from "../src/models/SiteGlobal";
 import Page from "../src/models/Page";
+import { DEFAULT_SERVICES_GRID } from "../src/data/services-reference";
+import {
+  ABOUT_ADVANTAGE_SECTION_DEFAULT,
+  ABOUT_HERO_SECTION_DEFAULT,
+  ABOUT_VALUES_SECTION_DEFAULT,
+  ABOUT_VISION_MISSION_SECTION_DEFAULT,
+  CONTACT_INQUIRY_SECTION_DEFAULT,
+  CTA_SECTION_DEFAULT,
+  HERO_SECTION_DEFAULT,
+  INTRO_SECTION_DEFAULT,
+  LEGAL_DOCUMENT_SECTION_DEFAULT,
+  LEGAL_HERO_SECTION_DEFAULT,
+  PRIVACY_DOCUMENT_SECTION_DEFAULT,
+  PRIVACY_HERO_SECTION_DEFAULT,
+  PROJECTS_CAPABILITIES_SECTION_DEFAULT,
+  PROJECTS_HERO_SECTION_DEFAULT,
+  PROJECTS_PORTFOLIO_SECTION_DEFAULT,
+  SERVICES_HERO_SECTION_DEFAULT,
+  SERVICES_SECTION_DEFAULT,
+  WHY_CHOOSE_SECTION_DEFAULT,
+} from "../src/data/page-section-defaults";
 import {
   defaultApplyNowModal,
   defaultFooterColumns,
@@ -34,119 +55,13 @@ const navItems = [
   { label: "HOME", href: "/" },
   { label: "SERVICES", href: "/services" },
   { label: "ABOUT", href: "/about" },
+  { label: "PROJECTS", href: "/project" },
   { label: "CONTACT US", href: "/contact" },
 ];
 const footerColumns = defaultFooterColumns;
 const footerMeta = defaultFooterMeta;
 
-const heroData = {
-  badge: "ENTERPRISE GRADE INTELLIGENCE",
-  title: ["POWERING", "SECURE", "AND", "FUTURE", "TECHNOLOGY"],
-  description:
-    "Adam Technology L.L.C. delivers high-precision digital infrastructure for the modern era. We architect, secure, and scale enterprise systems with industrial-grade resilience.",
-  primaryAction: { label: "EXPLORE SERVICES", href: "/services" },
-  secondaryAction: { label: "BOOK FREE ADVICE", href: "/contact" },
-  backgroundImage: "/home/hero-bg.jpg",
-};
-
-const introData = {
-  eyebrow: "About Us",
-  title: ["THE ARCHITECT OF", "ENTERPRISE", "TRUST"],
-  description:
-    "Headquartered in Dubai, Adam Technology L.L.C. stands at the intersection of security and innovation. We provide the sovereign digital foundations that global enterprises rely on.",
-  more:
-    'Our approach is rooted in "Cyber-Industrialism"—treating every software deployment and security protocol as a critical infrastructure project that requires absolute precision and zero-fail resilience.',
-  highlights: [],
-  image: "/home/headquarters.png",
-  href: "/about",
-  icon: "",
-  expcount: 10,
-};
-
-const servicesData = {
-  eyebrow: "OUR CAPABILITIES",
-  title: "CORE PILLARS",
-  description:
-    "Modular solutions designed to scale with the complexity of your operational demands.",
-  backgroundImage: "",
-  cards: [
-    {
-      icon: "security",
-      title: "CYBER SECURITY",
-      description:
-        "Defensive architecture and threat intelligence systems built to withstand the most sophisticated breaches.",
-    },
-    {
-      icon: "online",
-      title: "DATA & CLOUD",
-      description:
-        "High-performance cloud migration and sovereign data warehousing for sensitive enterprise assets.",
-    },
-    {
-      icon: "innovation",
-      title: "SOFTWARE & DEV",
-      description:
-        "Custom enterprise software engineered with a security-first methodology and technical excellence.",
-    },
-    {
-      icon: "corporate",
-      title: "CONSULTING",
-      description:
-        "Strategic advisory and specialized workforce training to foster a culture of technological resilience.",
-    },
-  ],
-};
-
-const servicesHeroData = {
-  title: ["SYSTEM", "ARCHITECTURE"],
-  description:
-    "Enterprise-grade technological dominance through modular infrastructure, elite cybersecurity protocols, and bespoke software orchestration.",
-  backgroundImage: "/home/hero-bg.jpg",
-};
-
-const servicesGridData = {
-  title: "",
-  description: "",
-  filters: ["ALL"],
-  cards: [
-    {
-      category: "THREAT INTEL",
-      title: "CYBERSECURITY",
-      description:
-        "Proactive threat neutralization and sovereign data protection. We deploy advanced cryptographic standards and real-time mesh monitoring to secure enterprise perimeters.",
-      features: ["THREAT INTEL", "ZERO TRUST", "SOC OPS"],
-      cta: "",
-      icon: "security",
-    },
-    {
-      category: "HYBRID MULTI-CLOUD",
-      title: "DATA & CLOUD",
-      description:
-        "High-availability cloud orchestration. Scalable neural architectures designed for 99.99% uptime and hyper-efficient data throughput.",
-      features: ["HYBRID MULTI-CLOUD", "EDGE COMPUTING"],
-      cta: "",
-      icon: "online",
-    },
-    {
-      category: "MODULAR STACKS",
-      title: "SOFTWARE & DEV",
-      description:
-        "Mission-critical application development. Precision-engineered codebase built for speed, modularity, and future-proof scaling.",
-      features: [],
-      cta: "",
-      icon: "innovation",
-    },
-    {
-      category: "EXECUTIVE ENABLEMENT",
-      title: "CONSULTING & TRAINING",
-      description:
-        "Empowering executive leadership through deep-tech audits and specialized personnel upskilling in emerging tech paradigms.",
-      features: [],
-      cta: "",
-      icon: "corporate",
-    },
-  ],
-};
+const servicesGridData = DEFAULT_SERVICES_GRID;
 
 const servicesAccordionData = {
   cards: [
@@ -345,30 +260,6 @@ const globalStandardsData = {
   ],
 };
 
-const whyChooseData = {
-  title: "",
-  subheading: "",
-  items: [
-    {
-      icon: "ShieldCheck",
-      title: "END-TO-END SECURITY",
-      description:
-        "We don't just 'treat' security; we build it into the DNA of every solution. From physical server security to encrypted application layers, your data remains impenetrable.",
-      tags: ["ENCRYPTION", "ZERO TRUST", "SOVEREIGN CONTROL"],
-    },
-    {
-      icon: "Sparkles",
-      title: "FUTURE-READY TECH",
-      description:
-        "Anticipating the next decade of digital evolution. Our stacks are built for modularity, ensuring you can integrate AI, Blockchain, and Quantum protocols seamlessly.",
-      tags: ["AI-DRIVEN", "EDGE READY", "SCALABLE MESH"],
-    },
-  ],
-};
-
-
-
-
 const clientLogosData = {
   eyebrow: "TRUSTED BY INSTITUTIONAL LEADERS",
   logos: ["GLOBAL BANK", "TECH LOGISTICS", "DUBAI URBAN", "GOV SECTOR", "CORE ENERGY"],
@@ -485,175 +376,24 @@ const researchHubData = {
   simulationImage: "/home/hero-bg.jpg",
 };
 
-const ctaData = {
-  title: "SYSTEM DEPLOYMENT STARTS HERE",
-  description:
-    "Secure your digital future with the UAE's premier technical architectural firm.",
-  action: { label: "BOOK CONSULTATION", href: "/contact" },
-};
-
-const aboutHeroData = {
-  titleAccent: "THE DIGITAL",
-  titleMain: "ARCHITECT",
-  description:
-    "Engineering high-precision digital ecosystems for global enterprises. We bridge the gap between industrial reliability and neural-speed innovation.",
-  image: "/home/headquarters.png",
-  stats: [
-    { value: "14+", label: "GLOBAL NODES" },
-    { value: "99.99%", label: "PROTOCOL UPTIME" },
-  ],
-};
-
-const aboutVisionMissionData = {
-  items: [
-    {
-      title: "MISSION",
-      description:
-        "To design and deploy bulletproof infrastructure that empowers the next generation of sovereign enterprise data. We don't just host; we architect resilience.",
-      icon: "Zap",
-      accentColor: "#111927",
-    },
-    {
-      title: "OBJECTIVE",
-      description:
-        "Securing the flow of global digital assets through hardware-first intelligence and cryptographical precision.",
-      icon: "Eye",
-      accentColor: "#34d8ff",
-    },
-  ],
-  vision: {
-    title: "VISION 2030",
-    quote:
-      '"A world where data is as structural and reliable as steel. We envision the total convergence of industrial engineering and digital protocol."',
-    badge: "PROTOCOL ACTIVE",
-  },
-};
-
-const aboutValuesData = {
-  title: "COMPLIANCE AND CERTIFICATIONS",
-  region: "DUBAI, UNITED ARAB EMIRATES",
-  items: [
-    {
-      title: "DUBAI LICENSED",
-      description:
-        "Fully registered and regulated by Dubai authorities for technology infrastructure and specialized digital services.",
-      icon: "Award",
-    },
-    {
-      title: "ISO CERTIFIED",
-      description:
-        "Adhering to ISO 27001 standards for information security management and data protection protocols.",
-      icon: "ShieldCheck",
-    },
-    {
-      title: "NIST FRAMEWORK",
-      description:
-        "Implementing NIST cybersecurity framework to provide enterprise-grade threat detection and mitigation.",
-      icon: "Shield",
-    },
-  ],
-  reach: {
-    title: "GLOBAL REACH",
-    image: "/home/hero-bg.jpg",
-    metrics: [
-      { value: "0.4MS", label: "LOCAL LATENCY" },
-      { value: "500PB", label: "DATA MANAGED" },
-      { value: "128-BIT", label: "ENCRYPTION STANDARD" },
-      { value: "24/7", label: "THREAT MONITORING" },
-    ],
-  },
-};
-const contactInquiryData = {
-  heroEyebrow: "PROTOCOL: COMMUNICATION",
-  heroTitleLines: ["CONNECT", "SECURELY"],
-  heroSideCopy:
-    "ENTERPRISE-GRADE COMMUNICATION NODES FOR INDUSTRIAL SCALING AND TECHNOLOGICAL SOVEREIGNTY.",
-  formTitle: "Initialize Inquiry",
-  formDescription: "Complete the transmission parameters below.",
-  submitLabel: "Send Message",
-  formFields: {
-    fullNameLabel: "Identifier / Name",
-    fullNamePlaceholder: "ENTER FULL NAME",
-    companyLabel: "Organization / Company",
-    companyPlaceholder: "ENTER COMPANY NAME",
-    workEmailLabel: "Secure Email Endpoint",
-    workEmailPlaceholder: "EMAIL@DOMAIN.COM",
-    interestLabel: "Operation Type / Service",
-    interestPlaceholder: "SELECT INFRASTRUCTURE MODULE",
-    messageLabel: "Message Payload",
-    messagePlaceholder: "TRANSMIT YOUR REQUIREMENTS...",
-    disclaimerText: "SYSTEM STATUS: READY FOR TRANSMISSION",
-    successMessage: "Thank you — our consultants will be in touch shortly.",
-    errorMessage: "Network error",
-  },
-  inquiryOptions: [
-    "Cybersecurity Architecture",
-    "Cloud Infrastructure",
-    "Software Engineering",
-    "Technology Consulting",
-    "Managed Operations",
-  ],
-  officeHeading: "Global Operations",
-  officeItems: [
-    {
-      title: "Dubai HQ",
-      lines: [
-        "Business Bay, Citadel Tower Unit 1402",
-        "Dubai, UAE",
-      ],
-      icon: "location",
-    },
-    {
-      title: "Hotline",
-      lines: ["+971 4 555 0192"],
-      icon: "phone",
-    },
-    {
-      title: "Secure Channel",
-      lines: ["ops@adamtech.ae"],
-      icon: "mail",
-    },
-  ],
-  departmentContacts: [
-    {
-      title: "Infrastructure",
-      subtitle: "Cloud and network systems",
-      email: "infra@adamtech.ae",
-    },
-    {
-      title: "Security",
-      subtitle: "SOC and incident response",
-      email: "security@adamtech.ae",
-    },
-    {
-      title: "Engineering",
-      subtitle: "Product and integrations",
-      email: "engineering@adamtech.ae",
-    },
-  ],
-  mapImage: "",
-  mapLabelTitle: "",
-  mapLabelSubtitle: "",
-};
-
 const homeSections = [
-  section("hero", 0, heroData),
-  section("intro", 1, introData),
-  section("services", 2, servicesData),
-  section("whyChoose", 3, whyChooseData),
-  section("cta", 4, ctaData),
+  section("hero", 0, HERO_SECTION_DEFAULT),
+  section("intro", 1, INTRO_SECTION_DEFAULT),
+  section("services", 2, SERVICES_SECTION_DEFAULT),
+  section("whyChoose", 3, WHY_CHOOSE_SECTION_DEFAULT),
+  section("cta", 4, CTA_SECTION_DEFAULT),
 ];
 
 const aboutSections = [
-  section("aboutHero", 0, aboutHeroData),
-  section("aboutVisionMission", 1, aboutVisionMissionData),
-  section("aboutValues", 2, aboutValuesData),
+  section("aboutHero", 0, ABOUT_HERO_SECTION_DEFAULT),
+  section("aboutVisionMission", 1, ABOUT_VISION_MISSION_SECTION_DEFAULT),
+  section("aboutValues", 2, ABOUT_VALUES_SECTION_DEFAULT),
+  section("aboutAdvantage", 3, ABOUT_ADVANTAGE_SECTION_DEFAULT),
 ];
 
 const servicesPageSections = [
-  section("servicesHero", 0, servicesHeroData),
+  section("servicesHero", 0, SERVICES_HERO_SECTION_DEFAULT),
   section("servicesGrid", 1, servicesGridData),
-  section("servicesCTA", 2, servicesCtaData),
 ];
 
 const coursesPageSections = [section("coursesCatalog", 0, coursesCatalogData)];
@@ -661,7 +401,23 @@ const incubationPageSections = [section("incubation", 0, incubationData)];
 const researchPageSections = [section("researchHub", 0, researchHubData)];
 
 const contactPageSections = [
-  section("contactInquiry", 0, contactInquiryData),
+  section("contactInquiry", 0, CONTACT_INQUIRY_SECTION_DEFAULT),
+];
+
+const projectPageSections = [
+  section("projectsHero", 0, PROJECTS_HERO_SECTION_DEFAULT),
+  section("projectsCapabilities", 1, PROJECTS_CAPABILITIES_SECTION_DEFAULT),
+  section("projectsPortfolio", 2, PROJECTS_PORTFOLIO_SECTION_DEFAULT),
+];
+
+const termsPageSections = [
+  section("legalHero", 0, LEGAL_HERO_SECTION_DEFAULT),
+  section("legalDocument", 1, LEGAL_DOCUMENT_SECTION_DEFAULT),
+];
+
+const privacyPageSections = [
+  section("legalHero", 0, PRIVACY_HERO_SECTION_DEFAULT),
+  section("legalDocument", 1, PRIVACY_DOCUMENT_SECTION_DEFAULT),
 ];
 
 async function main() {
@@ -673,11 +429,11 @@ async function main() {
 
   const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD ?? "AdminChangeMe!", 12);
   await User.findOneAndUpdate(
-    { email: "admin@owtc-fze.com" },
-    { $set: { email: "admin@owtc-fze.com", passwordHash } },
+    { email: "admin@adamtechnology.com" },
+    { $set: { email: "admin@adamtechnology.com", passwordHash } },
     { upsert: true },
   );
-  console.log("Admin user: admin@owtc-fze.com /", process.env.ADMIN_PASSWORD ?? "AdminChangeMe!");
+  console.log("Admin user: admin@adamtechnology.com /", process.env.ADMIN_PASSWORD ?? "AdminChangeMe!");
 
   await SiteGlobal.findOneAndUpdate(
     { key: "default" },
@@ -687,8 +443,8 @@ async function main() {
         navItems,
         footerColumns,
         footerMeta,
-        logoSrc: "/home/logo.png",
-        featureFlags: { clientLogos: true },
+        logoSrc: "",
+        featureFlags: { clientLogos: true, footerLogoLightFilter: true },
         applyNowModal: defaultApplyNowModal,
         seoDefaults: {
           defaultTitle: "Adam Technology L.L.C.",
@@ -731,10 +487,34 @@ const pages = [
       seoTitle: "Contact | Adam Technology L.L.C.",
       seoDescription: "Reach our advisors for enterprise cybersecurity, cloud & data, and custom software delivery.",
     },
+    {
+      slug: "project",
+      title: "Projects",
+      sections: projectPageSections,
+      seoTitle: "Projects | Adam Technology L.L.C.",
+      seoDescription:
+        "Explore Adam Technology case studies in cybersecurity, cloud infrastructure, and blockchain solutions for global enterprises.",
+    },
+    {
+      slug: "terms",
+      title: "Terms & Conditions",
+      sections: termsPageSections,
+      seoTitle: "Terms & Conditions | Adam Technology L.L.C.",
+      seoDescription:
+        "Read the Terms of Use governing access to and use of the Adam Technology website.",
+    },
+    {
+      slug: "privacy",
+      title: "Privacy Policy",
+      sections: privacyPageSections,
+      seoTitle: "Privacy Policy | Adam Technology L.L.C.",
+      seoDescription:
+        "Read how Adam Technology collects, uses, and protects personal data across our website and services.",
+    },
   ];
 
   await Page.deleteMany({
-    slug: { $nin: ["home", "about", "services", "contact"] },
+    slug: { $nin: ["home", "about", "services", "contact", "project", "terms", "privacy"] },
   });
   console.log("Removed non-core pages from DB");
 

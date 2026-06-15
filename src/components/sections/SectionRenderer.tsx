@@ -18,6 +18,11 @@ import AboutFrameworkSection from "./about/AboutFrameworkSection";
 import AboutCta from "./about/AboutCta";
 import ServicesSectionCta from "./services/ServicesSectionCta";
 import ServicesHeroSection from "./services/ServicesHeroSection";
+import ProjectsHeroSection from "./projects/ProjectsHeroSection";
+import ProjectsCapabilitiesSection from "./projects/ProjectsCapabilitiesSection";
+import ProjectsPortfolioSection from "./projects/ProjectsPortfolioSection";
+import LegalHeroSection from "./legal/LegalHeroSection";
+import LegalDocumentSection from "./legal/LegalDocumentSection";
 
 export default function SectionRenderer({
   pageSlug,
@@ -89,6 +94,12 @@ export default function SectionRenderer({
       return <ContactInquirySection content={section.data as never} />;
     case "servicesHero":
       return <ServicesHeroSection content={section.data as never} />;
+    case "projectsHero":
+      return <ProjectsHeroSection content={section.data as never} />;
+    case "projectsCapabilities":
+      return <ProjectsCapabilitiesSection content={section.data as never} />;
+    case "projectsPortfolio":
+      return <ProjectsPortfolioSection content={section.data as never} />;
     case "servicesAccordion":
       return <ServicesAccordionSection content={section.data as never} />;
     case "servicesGrid":
@@ -111,6 +122,10 @@ export default function SectionRenderer({
       return <AboutValuesSection content={section.data as never} />;
     case "aboutCTA":
       return <AboutCta content={section.data as never} />;
+    case "legalHero":
+      return <LegalHeroSection content={section.data as never} />;
+    case "legalDocument":
+      return <LegalDocumentSection content={section.data as never} />;
     default:
       return null;
   }

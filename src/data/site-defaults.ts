@@ -1,24 +1,64 @@
-﻿/** Shared defaults for seed + UI fallback when DB is empty. */
+/** Shared defaults for seed + UI fallback when DB is empty. */
+export const defaultLogoSrc = "";
+
 export const defaultNavItems = [
   { label: "Home", href: "/" },
-  { label: "About Us", href: "/about" },
   { label: "Services", href: "/services" },
+  { label: "About Us", href: "/about" },
+  { label: "Projects", href: "/project" },
   { label: "Contact", href: "/contact" },
 ];
 
-export const defaultFooterColumns = [];
+export type FooterLink = { label: string; href: string };
+export type FooterMetaLink = { label: string; href: string; icon?: string };
+export type FooterLinkColumn = { title: string; links: FooterLink[] };
+
+export const defaultFooterServicesColumn: FooterLinkColumn = {
+  title: "Services",
+  links: [
+    { label: "Cybersecurity", href: "/services#cybersecurity" },
+    { label: "Cloud Solutions", href: "/services#cloud" },
+    { label: "Data Services", href: "/services#data" },
+    { label: "Blockchain", href: "/services#blockchain" },
+  ],
+};
+
+export const defaultFooterCompanyColumn: FooterLinkColumn = {
+  title: "Company",
+  links: [
+    { label: "About Us", href: "/about" },
+    { label: "Projects", href: "/project" },
+    { label: "Contact", href: "/contact" },
+  ],
+};
+
+export const defaultFooterColumns: FooterLinkColumn[] = [
+  defaultFooterServicesColumn,
+  defaultFooterCompanyColumn,
+];
 
 export const defaultFooterMeta = {
-  brand: "ADAM TECH",
-  description: "",
-  social: [],
-  copyright:
-    "© 2024 ADAM TECHNOLOGY L.L.C. ALL RIGHTS RESERVED. DUBAI LICENSED.",
+  brand: "Adam Technology",
+  description:
+    "Pioneering secure digital horizons from the heart of Dubai, fully licensed and enterprise-ready.",
+  officeAddress:
+    "Adam Technology LLC, ART XV Residency, Office 103, Marasi Dr, Business Bay, Dubai, UAE",
+  social: [
+    {
+      icon: "globe",
+      label: "Website",
+      href: "https://www.adamtechnology.ae",
+    },
+    {
+      icon: "instagram",
+      label: "Instagram",
+      href: "https://www.instagram.com/adamtechnology",
+    },
+  ],
+  copyright: "© 2026 Adam Technology LLC",
   legal: [
-    { label: "PRIVACY POLICY", href: "/privacy" },
-    { label: "TERMS OF SERVICE", href: "/terms" },
-    { label: "SYSTEM STATUS", href: "/status" },
-    { label: "CONTACT", href: "/contact" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms and conditions", href: "/terms" },
   ],
 };
 

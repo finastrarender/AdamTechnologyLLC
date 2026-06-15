@@ -7,125 +7,24 @@ import Page from "@/models/Page";
 import SiteGlobal from "@/models/SiteGlobal";
 import { parseSectionData } from "@/schemas/sections";
 import { z } from "zod";
+import { getDefaultSectionData } from "@/data/page-section-defaults";
 import type { PageSection } from "@/types/section";
 import { nanoid } from "nanoid";
 
 function buildHomeSections(): PageSection[] {
-  const defs: Array<{ type: PageSection["type"]; order: number; data: Record<string, unknown> }> = [
-    {
-      type: "hero",
-      order: 0,
-      data: {
-        badge: "ENTERPRISE GRADE INTELLIGENCE",
-        title: ["POWERING", "SECURE", "AND", "FUTURE", "TECHNOLOGY"],
-        description:
-          "Adam Technology L.L.C. delivers high-precision digital infrastructure for the modern era. We architect, secure, and scale enterprise systems with industrial-grade resilience.",
-        primaryAction: { label: "EXPLORE SERVICES", href: "/services" },
-        secondaryAction: { label: "BOOK FREE ADVICE", href: "/contact" },
-        backgroundImage: "/home/hero-bg.jpg",
-      },
-    },
-    {
-      type: "intro",
-      order: 1,
-      data: {
-        eyebrow: "About Us",
-        title: ["THE ARCHITECT OF", "ENTERPRISE", "TRUST"],
-        description:
-          "Headquartered in Dubai, Adam Technology L.L.C. stands at the intersection of security and innovation. We provide the sovereign digital foundations that global enterprises rely on.",
-        highlights: [],
-        image: "/home/headquarters.png",
-        more: "",
-        href: "/about",
-        icon: "",
-        expcount: 10,
-      },
-    },
-    {
-      type: "services",
-      order: 2,
-      data: {
-        eyebrow: "OUR CAPABILITIES",
-        title: "CORE PILLARS",
-        description:
-          "Modular solutions designed to scale with the complexity of your operational demands.",
-        backgroundImage: "",
-        cards: [
-          {
-            icon: "security",
-            title: "CYBER SECURITY",
-            description:
-              "Defensive architecture and threat intelligence systems built to withstand the most sophisticated breaches.",
-          },
-          {
-            icon: "online",
-            title: "DATA & CLOUD",
-            description:
-              "High-performance cloud migration and sovereign data warehousing for sensitive enterprise assets.",
-          },
-          {
-            icon: "innovation",
-            title: "SOFTWARE & DEV",
-            description:
-              "Custom enterprise software engineered with a security-first methodology and technical excellence.",
-          },
-          {
-            icon: "corporate",
-            title: "CONSULTING",
-            description:
-              "Strategic advisory and specialized workforce training to foster a culture of technological resilience.",
-          },
-        ],
-      },
-    },
-    {
-      type: "whyChoose",
-      order: 3,
-      data: {
-        title: "",
-        subheading: "",
-        items: [
-          {
-            icon: "ShieldCheck",
-            title: "END-TO-END SECURITY",
-            description:
-              "We don't just 'treat' security; we build it into the DNA of every solution. From physical server security to encrypted application layers, your data remains impenetrable.",
-            tags: ["ENCRYPTION", "ZERO TRUST", "SOVEREIGN CONTROL"],
-          },
-          {
-            icon: "Sparkles",
-            title: "FUTURE-READY TECH",
-            description:
-              "Anticipating the next decade of digital evolution. Our stacks are built for modularity, ensuring you can integrate AI, Blockchain, and Quantum protocols seamlessly.",
-            tags: ["AI-DRIVEN", "EDGE READY", "SCALABLE MESH"],
-          },
-        ],
-      },
-    },
-    {
-      type: "clientLogos",
-      order: 4,
-      data: {
-        eyebrow: "TRUSTED BY INSTITUTIONAL LEADERS",
-        logos: ["GLOBAL BANK", "TECH LOGISTICS", "DUBAI URBAN", "GOV SECTOR", "CORE ENERGY"],
-      },
-    },
-    {
-      type: "cta",
-      order: 5,
-      data: {
-        title: "SYSTEM DEPLOYMENT STARTS HERE",
-        description: "Secure your digital future with the UAE's premier technical architectural firm.",
-        action: { label: "BOOK CONSULTATION", href: "/contact" },
-      },
-    },
+  const defs: Array<{ type: PageSection["type"]; order: number }> = [
+    { type: "hero", order: 0 },
+    { type: "intro", order: 1 },
+    { type: "services", order: 2 },
+    { type: "whyChoose", order: 3 },
+    { type: "cta", order: 4 },
   ];
 
-  return defs.map((d) => ({
+  return defs.map(({ type, order }) => ({
     id: nanoid(),
-    type: d.type,
-    order: d.order,
-    data: parseSectionData(d.type, d.data) as Record<string, unknown>,
+    type,
+    order,
+    data: parseSectionData(type, getDefaultSectionData(type)) as Record<string, unknown>,
   }));
 }
 
@@ -153,9 +52,9 @@ type RouteContext = { params: Promise<{ slug: string }> };
 
 function ensureHomeHasSections(sections: PageSection[]): PageSection[] {
   const defaults = buildHomeSections();
-  const desiredTypes = ["whyChoose", "clientLogos"];
+  const desiredTypes = ["whyChoose"];
 
-  let next = [...sections];
+  let next = sections.filter((s) => String(s.type) !== "clientLogos");
   for (const t of desiredTypes) {
     if (next.some((s) => String(s.type) === t)) continue;
     const fallback = defaults.find((s) => String(s.type) === t);
@@ -167,8 +66,7 @@ function ensureHomeHasSections(sections: PageSection[]): PageSection[] {
     intro: 1,
     services: 2,
     whyChoose: 3,
-    clientLogos: 4,
-    cta: 5,
+    cta: 4,
   };
 
   next = next.map((s) => {

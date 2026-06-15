@@ -1,5 +1,6 @@
 import type { z } from "zod";
 import type { introDataSchema } from "@/schemas/sections";
+import { INTRO_SECTION_DEFAULT } from "@/data/page-section-defaults";
 
 type IntroContent = z.infer<typeof introDataSchema>;
 
@@ -13,25 +14,18 @@ export default function IntroSection({
   const imageSrc =
     typeof content.image === "string" && content.image.trim() !== ""
       ? content.image
-      : "/home/headquarters.png";
+      : INTRO_SECTION_DEFAULT.image;
 
   const titleLines =
     Array.isArray(content.title) && content.title.length > 0
       ? content.title
-      : ["THE ARCHITECT OF", "ENTERPRISE", "TRUST"];
+      : INTRO_SECTION_DEFAULT.title;
 
-  const description =
-    typeof content.description === "string" && content.description.trim() !== ""
-      ? content.description
-      : "Headquartered in Dubai, Adam Technology L.L.C. stands at the intersection of security and innovation. We provide the sovereign digital foundations that global enterprises rely on.";
-
-  const more =
-    typeof content.more === "string" && content.more.trim() !== ""
-      ? content.more
-      : 'Our approach is rooted in "Cyber-Industrialism"—treating every software deployment and security protocol as a critical infrastructure project that requires absolute precision and zero-fail resilience.';
-
-  const expcount =
-    typeof content.expcount === "number" && Number.isFinite(content.expcount) ? content.expcount : 10;
+  const description = content.description?.trim() || INTRO_SECTION_DEFAULT.description;
+  const more = content.more?.trim() || INTRO_SECTION_DEFAULT.more;
+  const href = content.href?.trim() || INTRO_SECTION_DEFAULT.href;
+  const buttonLabel =
+    content.buttonLabel?.trim() || INTRO_SECTION_DEFAULT.buttonLabel;
 
   return (
     <section className="intro-section" id={anchorId ?? undefined}>
@@ -41,37 +35,26 @@ export default function IntroSection({
             <div className="intro-section__image-frame">
               <img
                 src={imageSrc}
-                alt="Architectural interior wireframe"
+                alt="Dubai enterprise architecture"
                 width={1200}
                 height={800}
                 decoding="async"
                 className="intro-section__image"
               />
             </div>
-            <div className="intro-section__metric-card">
-              <strong className="intro-section__metric-value">{expcount}+</strong>
-              <span className="intro-section__metric-label">YEARS EXPERTISE</span>
-            </div>
           </div>
         </div>
         <div className="intro-section__copy">
           <h2 className="intro-section__title">
-            {titleLines.slice(0, 3).map((line) => (
+            {titleLines.map((line) => (
               <span key={line}>{line}</span>
             ))}
           </h2>
           <p className="intro-section__description">{description}</p>
-          <p className="intro-section__description">{more}</p>
-          <div className="intro-section__meta">
-            <article className="intro-section__meta-item">
-              <h3>LICENSED</h3>
-              <p>Dubai Economy & Tourism</p>
-            </article>
-            <article className="intro-section__meta-item">
-              <h3>SECURITY</h3>
-              <p>ISO/IEC 27001 Standard</p>
-            </article>
-          </div>
+          {more ? <p className="intro-section__description">{more}</p> : null}
+          <a className="intro-section__button" href={href}>
+            {buttonLabel}
+          </a>
         </div>
       </div>
     </section>

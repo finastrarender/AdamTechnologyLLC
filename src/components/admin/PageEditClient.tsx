@@ -6,6 +6,15 @@ import { useCallback, useEffect, useState } from "react";
 import HeroSectionForm from "@/components/admin/HeroSectionForm";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import {
+  LegalDocumentSectionForm,
+  LegalHeroSectionForm,
+} from "@/components/admin/LegalSectionForms";
+import {
+  ProjectsCapabilitiesSectionForm,
+  ProjectsHeroSectionForm,
+  ProjectsPortfolioSectionForm,
+} from "@/components/admin/ProjectsSectionForms";
+import {
   AboutAdvantageSectionForm,
   AboutCtaSectionForm,
   AboutHeroSectionForm,
@@ -36,6 +45,7 @@ import {
   ServicesHeroSectionForm,
 } from "@/components/admin/SectionForms";
 import { type SectionType } from "@/types/section";
+import { getDefaultSectionData } from "@/data/page-section-defaults";
 
 type SectionRow = { id: string; type: string; order: number; data: Record<string, unknown> };
 type SectionSaveState = {
@@ -45,230 +55,14 @@ type SectionSaveState = {
 } | null;
 
 const PAGE_SECTION_TYPES: Record<string, SectionType[]> = {
-  home: ["hero", "intro", "services", "whyChoose", "clientLogos", "cta"],
-  services: ["servicesHero", "servicesGrid", "servicesCTA"],
-  about: ["aboutHero", "aboutOverview", "aboutVisionMission", "aboutFramework", "aboutAdvantage", "aboutValues", "aboutCTA"],
+  home: ["hero", "intro", "services", "whyChoose", "cta"],
+  project: ["projectsHero", "projectsCapabilities", "projectsPortfolio"],
+  services: ["servicesHero", "servicesGrid"],
+  about: ["aboutHero", "aboutVisionMission", "aboutValues", "aboutAdvantage"],
   contact: ["contactInquiry"],
+  terms: ["legalHero", "legalDocument"],
+  privacy: ["legalHero", "legalDocument"],
 };
-
-function defaultSectionData(type: SectionType): Record<string, unknown> {
-  switch (type) {
-    case "hero":
-      return {
-        badge: "ENTERPRISE GRADE INTELLIGENCE",
-        title: ["POWERING", "SECURE", "AND", "FUTURE", "TECHNOLOGY"],
-        description:
-          "Adam Technology L.L.C. delivers high-precision digital infrastructure for the modern era. We architect, secure, and scale enterprise systems with industrial-grade resilience.",
-        primaryAction: { label: "EXPLORE SERVICES", href: "/services" },
-        secondaryAction: { label: "BOOK FREE ADVICE", href: "/contact" },
-        backgroundImage: "/home/hero-bg.jpg",
-      };
-    case "intro":
-      return {
-        eyebrow: "About Us",
-        title: ["THE ARCHITECT OF", "ENTERPRISE", "TRUST"],
-        description:
-          "Headquartered in Dubai, Adam Technology L.L.C. stands at the intersection of security and innovation. We provide the sovereign digital foundations that global enterprises rely on.",
-        more:
-          'Our approach is rooted in "Cyber-Industrialism"—treating every software deployment and security protocol as a critical infrastructure project that requires absolute precision and zero-fail resilience.',
-        highlights: [],
-        image: "/home/headquarters.png",
-        href: "/about",
-        expcount: 10,
-      };
-    case "services":
-      return {
-        eyebrow: "OUR CAPABILITIES",
-        title: "CORE PILLARS",
-        description:
-          "Modular solutions designed to scale with the complexity of your operational demands.",
-        backgroundImage: "",
-        cards: [
-          {
-            icon: "security",
-            title: "CYBER SECURITY",
-            description:
-              "Defensive architecture and threat intelligence systems built to withstand the most sophisticated breaches.",
-          },
-          {
-            icon: "online",
-            title: "DATA & CLOUD",
-            description:
-              "High-performance cloud migration and sovereign data warehousing for sensitive enterprise assets.",
-          },
-          {
-            icon: "innovation",
-            title: "SOFTWARE & DEV",
-            description:
-              "Custom enterprise software engineered with a security-first methodology and technical excellence.",
-          },
-          {
-            icon: "corporate",
-            title: "CONSULTING",
-            description:
-              "Strategic advisory and specialized workforce training to foster a culture of technological resilience.",
-          },
-        ],
-      };
-    case "whyChoose":
-      return {
-        title: "",
-        subheading: "",
-        items: [
-          {
-            icon: "ShieldCheck",
-            title: "END-TO-END SECURITY",
-            description:
-              "We don't just 'treat' security; we build it into the DNA of every solution. From physical server security to encrypted application layers, your data remains impenetrable.",
-            tags: ["ENCRYPTION", "ZERO TRUST", "SOVEREIGN CONTROL"],
-          },
-          {
-            icon: "Sparkles",
-            title: "FUTURE-READY TECH",
-            description:
-              "Anticipating the next decade of digital evolution. Our stacks are built for modularity, ensuring you can integrate AI, Blockchain, and Quantum protocols seamlessly.",
-            tags: ["AI-DRIVEN", "EDGE READY", "SCALABLE MESH"],
-          },
-        ],
-      };
-    case "clientLogos":
-      return {
-        eyebrow: "TRUSTED BY INSTITUTIONAL LEADERS",
-        logos: ["GLOBAL BANK", "TECH LOGISTICS", "DUBAI URBAN", "GOV SECTOR", "CORE ENERGY"],
-      };
-    case "cta":
-      return {
-        title: "SYSTEM DEPLOYMENT STARTS HERE",
-        description: "Secure your digital future with the UAE's premier technical architectural firm.",
-        action: { label: "BOOK CONSULTATION", href: "/contact" },
-      };
-    case "servicesHero":
-      return {
-        title: ["SYSTEM", "ARCHITECTURE"],
-        description:
-          "Enterprise-grade infrastructure, elite cybersecurity protocols, and bespoke software orchestration.",
-      };
-    case "servicesGrid":
-      return {
-        title: "SERVICES",
-        description: "Explore our core service lines.",
-        filters: ["ALL"],
-        cards: [
-          {
-            category: "CYBERSECURITY",
-            title: "CYBERSECURITY",
-            description: "Threat protection, hardening, and security operations.",
-            features: ["ZERO TRUST", "SOC OPS", "THREAT INTEL"],
-            cta: "INQUIRE",
-            icon: "security",
-          },
-        ],
-      };
-    case "servicesCTA":
-      return {
-        title: "SECURE YOUR STACK",
-        description: "Get a tailored plan for your organization.",
-        primaryAction: { label: "INQUIRE", href: "/contact" },
-        secondaryAction: { label: "ABOUT US", href: "/about" },
-      };
-    case "aboutHero":
-      return {
-        titleAccent: "COMPLIANCE AND",
-        titleMain: "CERTIFICATIONS",
-        description:
-          "Adam Technology L.L.C. operates under strict regulatory frameworks and security standards.",
-        image: "/home/headquarters.png",
-        stats: [
-          { value: "ISO", label: "SECURITY" },
-          { value: "NIST", label: "FRAMEWORK" },
-        ],
-      };
-    case "aboutVisionMission":
-      return {
-        items: [
-          {
-            title: "VISION",
-            description: "Build resilient infrastructure for a secure digital future.",
-            accentColor: "#4ad9ff",
-          },
-          {
-            title: "MISSION",
-            description: "Deliver security-first engineering with measurable outcomes.",
-            accentColor: "#41ef54",
-          },
-        ],
-      };
-    case "aboutFramework":
-      return {
-        title: "SECURITY FRAMEWORK",
-        description: "A practical approach to governance, resilience, and delivery.",
-        pillars: [{ letter: "A", title: "ASSESS", description: "Audit, map, and baseline risk." }],
-      };
-    case "aboutAdvantage":
-      return {
-        eyebrow: "WHY US",
-        title: ["SECURITY", "BY DESIGN"],
-        description: "We ship with operational discipline and measurable controls.",
-        points: ["Risk-led planning", "Secure delivery pipelines", "Continuous monitoring"],
-        image: "/home/headquarters.png",
-      };
-    case "aboutValues":
-      return {
-        title: "COMPLIANCE AND\nCERTIFICATIONS",
-        description:
-          "ADAM TECHNOLOGY L.L.C. operates under strict regulatory frameworks, ensuring global compliance and institutional security standards.",
-        region: "DUBAI, UNITED ARAB EMIRATES",
-        items: [
-          { title: "DUBAI\nLICENSED", description: "Fully registered and regulated by Dubai authorities.", icon: "Award" },
-          { title: "ISO\nCERTIFIED", description: "Aligned to ISO 27001 security management standards.", icon: "ShieldCheck" },
-          { title: "NIST\nFRAMEWORK", description: "Mapped to NIST for enterprise-grade risk controls.", icon: "Shield" },
-        ],
-      };
-    case "aboutCTA":
-      return {
-        title: ["READY TO SECURE", "YOUR STACK?"],
-        description: "Talk to our team about your security and infrastructure goals.",
-        primaryAction: { label: "INQUIRE", href: "/contact" },
-        secondaryAction: { label: "VIEW SERVICES", href: "/services" },
-      };
-    case "contactInquiry":
-      return {
-        heroEyebrow: "PROTOCOL: COMMUNICATION",
-        heroTitleLines: ["CONNECT", "SECURELY"],
-        heroSideCopy:
-          "ENTERPRISE-GRADE COMMUNICATION NODES FOR INDUSTRIAL SCALING AND TECHNOLOGICAL SOVEREIGNTY.",
-        formTitle: "Initialize Inquiry",
-        formDescription: "Complete the transmission parameters below.",
-        submitLabel: "Send Message",
-        inquiryOptions: ["Cybersecurity", "Cloud & Data", "Software Engineering", "Consulting"],
-        officeHeading: "Global Operations",
-        officeItems: [
-          { title: "Dubai HQ", lines: ["Business Bay, Dubai, UAE"], icon: "location" },
-          { title: "Secure Channel", lines: ["ops@adamtech.ae"], icon: "mail" },
-        ],
-        formFields: {
-          fullNameLabel: "Identifier / Name",
-          fullNamePlaceholder: "ENTER FULL NAME",
-          companyLabel: "Organization / Company",
-          companyPlaceholder: "ENTER COMPANY NAME",
-          workEmailLabel: "Secure Email Endpoint",
-          workEmailPlaceholder: "EMAIL@DOMAIN.COM",
-          interestLabel: "Operation Type / Service",
-          interestPlaceholder: "SELECT INFRASTRUCTURE MODULE",
-          messageLabel: "Message Payload",
-          messagePlaceholder: "TRANSMIT YOUR REQUIREMENTS...",
-          disclaimerText: "SYSTEM STATUS: READY FOR TRANSMISSION",
-          successMessage: "Thank you — our consultants will be in touch shortly.",
-          errorMessage: "Network error",
-        },
-        mapImage: "/home/hero-bg.jpg",
-        mapLabelTitle: "ADAM HQ DUBAI",
-        mapLabelSubtitle: "",
-      };
-    default:
-      return {};
-  }
-}
 
 function normalizeSlugForPath(value: string | undefined | null) {
   return String(value ?? "")
@@ -475,7 +269,7 @@ export default function PageEditClient({ slug }: { slug: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: newSectionType,
-          data: defaultSectionData(newSectionType),
+          data: getDefaultSectionData(newSectionType),
         }),
       });
       const json = await parseJsonResponse(res);
@@ -565,7 +359,12 @@ export default function PageEditClient({ slug }: { slug: string }) {
           </label>
           <label>
             SEO title
-            <input name="seoTitle" key={page.seoTitle} defaultValue={page.seoTitle ?? ""} />
+            <input
+              name="seoTitle"
+              key={page.seoTitle}
+              defaultValue={page.seoTitle ?? ""}
+              placeholder="About Us | Adam Technology L.L.C."
+            />
           </label>
           <label>
             SEO description
@@ -574,6 +373,7 @@ export default function PageEditClient({ slug }: { slug: string }) {
               key={page.seoDescription}
               defaultValue={page.seoDescription ?? ""}
               rows={3}
+              placeholder="Adam Technology L.L.C. delivers enterprise-grade cybersecurity, cloud & data infrastructure, and custom software engineering from Dubai, UAE."
             />
           </label>
           <label>
@@ -969,6 +769,36 @@ function SectionEditor({
           saveMessageTone={saveMessageTone}
         />
       );
+    case "projectsHero":
+      return (
+        <ProjectsHeroSectionForm
+          section={section}
+          onSave={onSave}
+          previewHref={previewHref}
+          saveMessage={saveMessage}
+          saveMessageTone={saveMessageTone}
+        />
+      );
+    case "projectsCapabilities":
+      return (
+        <ProjectsCapabilitiesSectionForm
+          section={section}
+          onSave={onSave}
+          previewHref={previewHref}
+          saveMessage={saveMessage}
+          saveMessageTone={saveMessageTone}
+        />
+      );
+    case "projectsPortfolio":
+      return (
+        <ProjectsPortfolioSectionForm
+          section={section}
+          onSave={onSave}
+          previewHref={previewHref}
+          saveMessage={saveMessage}
+          saveMessageTone={saveMessageTone}
+        />
+      );
     case "industriesHero":
       return (
         <IndustriesHeroSectionForm
@@ -1002,6 +832,26 @@ function SectionEditor({
     case "researchHub":
       return (
         <ResearchHubSectionForm
+          section={section}
+          onSave={onSave}
+          previewHref={previewHref}
+          saveMessage={saveMessage}
+          saveMessageTone={saveMessageTone}
+        />
+      );
+    case "legalHero":
+      return (
+        <LegalHeroSectionForm
+          section={section}
+          onSave={onSave}
+          previewHref={previewHref}
+          saveMessage={saveMessage}
+          saveMessageTone={saveMessageTone}
+        />
+      );
+    case "legalDocument":
+      return (
+        <LegalDocumentSectionForm
           section={section}
           onSave={onSave}
           previewHref={previewHref}

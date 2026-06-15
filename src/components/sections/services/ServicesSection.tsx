@@ -11,7 +11,11 @@ export default function ServicesSection({ content }: { content: ServicesContent 
   const eyebrow =
     typeof data.eyebrow === "string" && data.eyebrow.trim() !== ""
       ? data.eyebrow
-      : "OUR CAPABILITIES";
+      : "OUR EXPERTISE";
+  const title =
+    typeof content.title === "string" && content.title.trim() !== ""
+      ? content.title
+      : "Integrated Tech Ecosystem";
 
   return (
     <section className="services-section">
@@ -19,9 +23,11 @@ export default function ServicesSection({ content }: { content: ServicesContent 
         <div className="services-pillars__header">
           <div className="services-pillars__header-main">
             <p className="services-pillars__eyebrow">{eyebrow}</p>
-            <h2 className="services-pillars__title">{content.title}</h2>
+            <h2 className="services-pillars__title">{title}</h2>
           </div>
-          <p className="services-pillars__description">{content.description}</p>
+          {content.description?.trim() ? (
+            <p className="services-pillars__description">{content.description}</p>
+          ) : null}
         </div>
 
         <div className="services-pillars__grid">

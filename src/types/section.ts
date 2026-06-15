@@ -25,10 +25,15 @@ export const SECTION_TYPES = [
   "contactHero",
   "contactInquiry",
   "servicesHero",
+  "projectsHero",
+  "projectsCapabilities",
+  "projectsPortfolio",
   "industriesHero",
   "industriesGrid",
   "industriesCta",
   "researchHub",
+  "legalHero",
+  "legalDocument",
 ] as const;
 
 export type SectionType = (typeof SECTION_TYPES)[number];

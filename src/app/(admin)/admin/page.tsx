@@ -18,7 +18,7 @@ export default async function AdminDashboardPage() {
   return (
     <div className="admin-shell admin-dashboard">
       <nav className="admin-nav admin-dashboard__nav">
-        <strong className="admin-dashboard__brand">ADAM CONTROL</strong>
+        <strong className="admin-dashboard__brand">Admin</strong>
         <div className="admin-dashboard__nav-links">
           <Link href="/">View site</Link>
           <Link href="/admin/site-global">Site global</Link>
@@ -27,30 +27,12 @@ export default async function AdminDashboardPage() {
       </nav>
       <div className="admin-card admin-dashboard__card">
         <header className="admin-dashboard__header">
-          <p className="admin-dashboard__eyebrow">PROTOCOL CONTROL</p>
-          <h1 className="admin-dashboard__title">
-            <span>ADMIN</span>
-            <span>SECURELY</span>
-          </h1>
+          <h1 className="admin-dashboard__title">Content management</h1>
           <p className="admin-muted admin-dashboard__subtitle">
-            Signed in as <strong>{session.user.email}</strong>. Configure content, then publish.
+            Signed in as <strong>{session.user.email}</strong>. Edit a page, then publish your
+            changes.
           </p>
         </header>
-
-        <section className="admin-dashboard__stats" aria-label="Dashboard summary">
-          <article className="admin-dashboard__stat">
-            <p className="admin-dashboard__stat-label">Total pages</p>
-            <p className="admin-dashboard__stat-value">{pages.length}</p>
-          </article>
-          <article className="admin-dashboard__stat">
-            <p className="admin-dashboard__stat-label">Site config</p>
-            <p className="admin-dashboard__stat-value">Global control</p>
-          </article>
-          <article className="admin-dashboard__stat">
-            <p className="admin-dashboard__stat-label">Reminder</p>
-            <p className="admin-dashboard__stat-value">Sync after edits</p>
-          </article>
-        </section>
 
         <section className="admin-dashboard__section">
           <div className="admin-dashboard__section-head">
@@ -80,20 +62,6 @@ export default async function AdminDashboardPage() {
             {pages.length === 0 ? (
               <p className="admin-muted">No pages found.</p>
             ) : null}
-          </div>
-        </section>
-
-        <section className="admin-dashboard__section">
-          <div className="admin-dashboard__section-head">
-            <h2>Quick links</h2>
-          </div>
-          <div className="admin-dashboard__quick-links">
-            <Link href="/admin/site-global" className="admin-button-secondary">
-              Edit site global settings
-            </Link>
-            <Link href="/" className="admin-button-secondary">
-              Open public website
-            </Link>
           </div>
         </section>
       </div>

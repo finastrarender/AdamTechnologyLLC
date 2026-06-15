@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { draftMode } from "next/headers";
 import { getFallbackPageView } from "@/data/fallback-pages";
+import { DEFAULT_SERVICES_GRID, mergeServicesGridContent } from "@/data/services-reference";
 import { cacheTags } from "@/lib/cache-tags";
 import { connectMongo } from "@/lib/mongoose";
 import Page from "@/models/Page";
@@ -45,7 +46,9 @@ function pageToPublicView(
   let effectiveSections = toPlainSections(source);
   if (page.slug === "home") {
     const fallback = getFallbackPageView("home");
-    const desiredTypes = ["whyChoose", "clientLogos"];
+    effectiveSections = effectiveSections.filter((s) => String(s.type) !== "clientLogos");
+
+    const desiredTypes = ["whyChoose"];
     for (const t of desiredTypes) {
       if (effectiveSections.some((s) => String(s.type) === t)) continue;
       const fallbackSection = fallback?.effectiveSections?.find((s) => String(s.type) === t);
@@ -57,19 +60,64 @@ function pageToPublicView(
       intro: 1,
       services: 2,
       whyChoose: 3,
-      clientLogos: 4,
-      cta: 5,
+      cta: 4,
     };
 
     effectiveSections = effectiveSections
       .map((s) => {
         const t = String(s.type);
+        if (t === "services") {
+          const data = s.data as Record<string, unknown>;
+          const fallbackServices = fallback?.effectiveSections?.find(
+            (section) => String(section.type) === "services",
+          );
+          if (
+            fallbackServices &&
+            (data.title === "CORE PILLARS" || data.eyebrow === "OUR CAPABILITIES")
+          ) {
+            return { ...s, data: fallbackServices.data };
+          }
+        }
         if (desiredOrder[t] === undefined) return s;
         if (s.order === desiredOrder[t]) return s;
         return { ...s, order: desiredOrder[t] };
       })
       .sort((a, b) => a.order - b.order);
   }
+
+  if (page.slug === "services") {
+    const fallback = getFallbackPageView("services");
+    const fallbackHero = fallback?.effectiveSections?.find((s) => String(s.type) === "servicesHero");
+    const fallbackGrid = fallback?.effectiveSections?.find((s) => String(s.type) === "servicesGrid");
+
+    effectiveSections = effectiveSections
+      .filter((s) => String(s.type) !== "servicesCTA")
+      .map((s) => {
+        const type = String(s.type);
+        if (type === "servicesHero" && fallbackHero) {
+          const data = s.data as Record<string, unknown>;
+          const hasReferenceEyebrow =
+            typeof data.eyebrow === "string" &&
+            data.eyebrow.trim().toUpperCase() === "STRATEGIC TECHNOLOGY PARTNER";
+          if (!hasReferenceEyebrow) {
+            return { ...s, data: fallbackHero.data };
+          }
+        }
+        if (type === "servicesGrid") {
+          const data = s.data as Record<string, unknown>;
+          if (!data.cybersecurity || Array.isArray(data.cards)) {
+            const merged = mergeServicesGridContent(
+              (fallbackGrid?.data as Record<string, unknown> | undefined) ?? DEFAULT_SERVICES_GRID,
+            );
+            return { ...s, data: merged };
+          }
+          return { ...s, data: mergeServicesGridContent(data) };
+        }
+        return s;
+      })
+      .sort((a, b) => a.order - b.order);
+  }
+
   return {
     slug: page.slug,
     title: page.title,
@@ -133,10 +181,10 @@ export async function resolvePageForRequest(slug: string): Promise<PublicPageVie
   if (isEnabled) {
     const d = await getPageDraftView(slug);
     if (d) return d;
-    return getBootFallbackPage(slug);
+    return getFallbackPageView(slug) ?? getBootFallbackPage(slug);
   }
 
   const live = await getPublishedPageCached(slug);
   if (live) return live;
-  return getBootFallbackPage(slug);
+  return getFallbackPageView(slug) ?? getBootFallbackPage(slug);
 }

@@ -1,30 +1,31 @@
 import type { z } from "zod";
 import type { clientLogosDataSchema } from "@/schemas/sections";
+import { Building2, Cross, Landmark, Shield, Zap } from "lucide-react";
 
 type LogosContent = z.infer<typeof clientLogosDataSchema>;
 
 export default function ClientLogosSection({ content }: { content: LogosContent }) {
-  const eyebrow =
-    typeof content.eyebrow === "string" && content.eyebrow.trim() !== ""
-      ? content.eyebrow
-      : "TRUSTED BY INSTITUTIONAL LEADERS";
+  void content;
 
-  const logos = (Array.isArray(content.logos) ? content.logos : [])
-    .map((logo) => String(logo).trim())
-    .filter(Boolean);
-  const normalizedLogos =
-    logos.length > 0
-      ? logos
-      : ["GLOBAL BANK", "TECH LOGISTICS", "DUBAI URBAN", "GOV SECTOR", "CORE ENERGY"];
+  const eyebrow = "LICENSED BY DUBAI DEPARTMENT OF ECONOMY & TOURISM";
+  const logos = [
+    { label: "FINBANK", Icon: Landmark },
+    { label: "MEDITECH", Icon: Cross },
+    { label: "DXB_GOV", Icon: Building2 },
+    { label: "SECURE_AE", Icon: Shield },
+    { label: "ENERGY_CORE", Icon: Zap },
+    { label: "FINBANK", Icon: Landmark },
+  ];
 
   return (
     <section className="logos-section">
       <div className="logos-section__card">
         <p className="logos-section__eyebrow">{eyebrow}</p>
         <div className="logos-section__grid">
-          {normalizedLogos.map((logo) => (
-            <p key={logo} className="logos-section__logo">
-              {logo}
+          {logos.map(({ label, Icon }, index) => (
+            <p key={`${label}-${index}`} className="logos-section__logo">
+              <Icon aria-hidden="true" />
+              {label}
             </p>
           ))}
         </div>

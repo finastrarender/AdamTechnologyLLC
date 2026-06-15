@@ -1,45 +1,79 @@
 import type { z } from "zod";
 import type { whyChooseDataSchema } from "@/schemas/sections";
-import * as Icons from "lucide-react";
-import React from "react";
+import { WHY_CHOOSE_SECTION_DEFAULT } from "@/data/page-section-defaults";
+import {
+  Cloud,
+  Database,
+  Link as LinkIcon,
+  Rocket,
+  Settings,
+  ShieldCheck,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
 
 type WhyContent = z.infer<typeof whyChooseDataSchema>;
 
+const WHY_ICONS: Record<string, LucideIcon> = {
+  ShieldCheck,
+  shieldCheck: ShieldCheck,
+  shield: ShieldCheck,
+  Rocket,
+  rocket: Rocket,
+  Sparkles,
+  sparkles: Sparkles,
+};
+
 export default function WhyChooseSection({ content }: { content: WhyContent }) {
-  const items = (content.items ?? []).slice(0, 2);
-  const hasHeader = Boolean(content.title?.trim() || content.subheading?.trim());
+  const title = content.title?.trim() || WHY_CHOOSE_SECTION_DEFAULT.title;
+  const subheading = content.subheading?.trim() || WHY_CHOOSE_SECTION_DEFAULT.subheading;
+  const items =
+    Array.isArray(content.items) && content.items.length > 0
+      ? content.items
+      : WHY_CHOOSE_SECTION_DEFAULT.items;
 
   return (
     <section className="why-section">
       <div className="why-section__inner section-shell">
-        {hasHeader ? (
-          <div className="why-section__header">
-            {content.title ? <h2>{content.title}</h2> : null}
-            {content.subheading ? <p className="why-section__subheading">{content.subheading}</p> : null}
-          </div>
-        ) : null}
-        <div className="why-section__grid">
-          {items.map((item, i) => {
-            const Icon = Icons[item.icon as keyof typeof Icons] as React.ElementType;
-            return (
-              <article key={i} className="why-card">
-                <div className="why-card__icon" aria-hidden="true">
-                  {Icon ? <Icon /> : null}
-                </div>
-                <h3 className="why-card__title">{item.title}</h3>
-                {item.description ? <p className="why-card__description">{item.description}</p> : null}
-                {Array.isArray(item.tags) && item.tags.length > 0 ? (
-                  <div className="why-card__tags">
-                    {item.tags.map((tag, tagIndex) => (
-                      <span key={`${tag}-${tagIndex}`} className="why-card__tag">
-                        {tag}
-                      </span>
-                    ))}
+        <div className="why-section__copy">
+          <h2 className="why-section__title">{title}</h2>
+          {subheading ? <p>{subheading}</p> : null}
+
+          <div className="why-section__points">
+            {items.map((item, index) => {
+              const Icon = WHY_ICONS[item.icon] ?? (index === 0 ? ShieldCheck : Rocket);
+              return (
+                <article key={`${item.title}-${index}`}>
+                  <span>
+                    <Icon aria-hidden="true" />
+                  </span>
+                  <div>
+                    <h3>{item.title}</h3>
+                    {item.description ? <p>{item.description}</p> : null}
                   </div>
-                ) : null}
-              </article>
-            );
-          })}
+                </article>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="ecosystem-orbit" aria-label="Technology ecosystem diagram">
+          <div className="ecosystem-orbit__ring" />
+          <div className="ecosystem-orbit__core">
+            <Settings aria-hidden="true" />
+          </div>
+          <span className="ecosystem-orbit__node ecosystem-orbit__node--cloud">
+            <Cloud aria-hidden="true" /> Cloud
+          </span>
+          <span className="ecosystem-orbit__node ecosystem-orbit__node--data">
+            <Database aria-hidden="true" /> Data
+          </span>
+          <span className="ecosystem-orbit__node ecosystem-orbit__node--web">
+            <LinkIcon aria-hidden="true" /> Web3
+          </span>
+          <span className="ecosystem-orbit__node ecosystem-orbit__node--cyber">
+            <ShieldCheck aria-hidden="true" /> Cyber
+          </span>
         </div>
       </div>
     </section>

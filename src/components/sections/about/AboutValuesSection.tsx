@@ -1,74 +1,65 @@
 import type { z } from "zod";
 import type { aboutValuesDataSchema } from "@/schemas/sections";
-import * as Icons from "lucide-react";
-import React from "react";
+import { Lightbulb } from "lucide-react";
+import { resolveAboutPageIcon } from "@/components/sections/about/about-page-icons";
 
 type AboutValuesContent = z.infer<typeof aboutValuesDataSchema>;
 
+const DEFAULT_ITEMS = [
+  {
+    title: "Innovation",
+    description: "Pushing boundaries to find smarter, more efficient ways to solve complex challenges.",
+    icon: "lightbulb",
+  },
+  {
+    title: "Security",
+    description: "A non-negotiable priority built into the core of every solution we architect.",
+    icon: "shieldCheck",
+  },
+  {
+    title: "Reliability",
+    description: "Consistency in performance and integrity in our commitments to clients.",
+    icon: "handshake",
+  },
+  {
+    title: "Client Success",
+    description: "Measuring our performance by the growth and success of the businesses we serve.",
+    icon: "trophy",
+  },
+];
+
+const DEFAULT_DESCRIPTION =
+  "The foundational principles that guide every interaction and project delivery at Adam Technology.";
+
+function ValueCardIcon({ name }: { name?: string }) {
+  const Icon = resolveAboutPageIcon(name, Lightbulb);
+
+  return <Icon className="about-values-card__icon-svg" aria-hidden="true" strokeWidth={1.75} />;
+}
+
 export default function AboutValuesSection({ content }: { content: AboutValuesContent }) {
-  const titleText = String(content.title ?? "").trim();
-  const titleDisplay =
-    titleText.includes("\n") ? titleText : titleText.replace(/\s+and\s+/i, " AND\n");
-  const leadText =
-    (content.description ?? "").trim() ||
-    "ADAM TECHNOLOGY L.L.C. operates under strict regulatory frameworks, ensuring global compliance and institutional security standards.";
-  const reach = content.reach ?? {
-    title: "GLOBAL REACH",
-    image: "/home/headquarters.png",
-    metrics: [
-      { value: "0.4MS", label: "LOCAL LATENCY" },
-      { value: "500PB", label: "DATA MANAGED" },
-      { value: "128-BIT", label: "ENCRYPTION STANDARD" },
-      { value: "24/7", label: "THREAT MONITORING" },
-    ],
-  };
+  const items = content.items?.length ? content.items : DEFAULT_ITEMS;
+  const description = content.description?.trim() || DEFAULT_DESCRIPTION;
 
   return (
-    <section className="about-values">
+    <section className="about-values about-values--reference">
       <div className="section-shell">
-        <div className="about-values__heading">
-          <div className="about-values__heading-left">
-            <h2 className="about-values__title">{titleDisplay}</h2>
-            <p className="about-values__lead">{leadText}</p>
-          </div>
-          <p className="about-values__region">{content.region ?? "DUBAI, UNITED ARAB EMIRATES"}</p>
-        </div>
+        <header className="about-values__header">
+          <h2 className="about-values__title">{content.title || "Our Core Values"}</h2>
+          <p className="about-values__description">{description}</p>
+        </header>
 
         <div className="about-values__grid">
-          {content.items.slice(0, 3).map((item) => {
-            const Icon = Icons[item.icon as keyof typeof Icons] as React.ElementType;
-            return <article key={`${item.title}-${item.description}`} className="about-value-card">
-              <div className="about-value-card__icon" aria-hidden="true">
-                {Icon ? <Icon size={18} /> : ""}
-              </div>
-              <h3 className="about-value-card__title">{item.title}</h3>
-              <p className="about-value-card__description">{item.description}</p>
-            </article>;
-          })}
+          {items.map((item) => (
+            <article key={item.title} className="about-values-card">
+              <span className="about-values-card__icon" aria-hidden="true">
+                <ValueCardIcon name={item.icon} />
+              </span>
+              <h3 className="about-values-card__title">{item.title}</h3>
+              <p className="about-values-card__description">{item.description}</p>
+            </article>
+          ))}
         </div>
-
-        <article className="about-values__reach">
-          <div className="about-values__reach-image-wrap">
-            <img
-              src={reach.image}
-              alt=""
-              width={420}
-              height={320}
-              className="about-values__reach-image"
-            />
-          </div>
-          <div className="about-values__reach-content">
-            <h3 className="about-values__reach-title">{reach.title}</h3>
-            <div className="about-values__reach-metrics">
-              {reach.metrics.slice(0, 4).map((metric) => (
-                <div key={`${metric.value}-${metric.label}`} className="about-values__reach-metric">
-                  <p>{metric.value}</p>
-                  <span>{metric.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </article>
       </div>
     </section>
   );

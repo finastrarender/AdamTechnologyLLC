@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-
+import HashLink from "@/components/layout/HashLink";
 export type NavItem = { label: string; href: string; active?: boolean };
 
 function isActive(pathname: string, href: string) {
@@ -13,8 +13,12 @@ function isActive(pathname: string, href: string) {
 
 export default function SiteHeader({
   navItems,
+  logoSrc,
+  brandName = "Adam Technology",
 }: {
   navItems: NavItem[];
+  logoSrc?: string;
+  brandName?: string;
 }) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,10 +29,9 @@ export default function SiteHeader({
 
   useEffect(() => {
     if (!isMenuOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    document.body.classList.add("site-nav-open");
     return () => {
-      document.body.style.overflow = prev;
+      document.body.classList.remove("site-nav-open");
     };
   }, [isMenuOpen]);
 
@@ -37,10 +40,11 @@ export default function SiteHeader({
       typeof item?.href === "string" && item.href.trim() !== "" && typeof item?.label === "string" && item.label.trim() !== "",
   );
   const preferredNav = [
-    { keys: ["home"], href: "/", label: "HOME" },
-    { keys: ["services"], href: "/services", label: "SERVICES" },
-    { keys: ["about", "about us"], href: "/about", label: "ABOUT US" },
-    { keys: ["contact", "contact us"], href: "/contact", label: "CONTACT US" },
+    { keys: ["home"], href: "/", label: "Home" },
+    { keys: ["services"], href: "/services", label: "Services" },
+    { keys: ["about", "about us"], href: "/about", label: "About" },
+    { keys: ["project", "projects"], href: "/project", label: "Projects" },
+    { keys: ["contact", "contact us"], href: "/contact", label: "Contact" },
   ];
 
   const displayNavItems = preferredNav
@@ -49,14 +53,28 @@ export default function SiteHeader({
       if (found) return { ...found, label };
       return { label, href };
     })
-    .slice(0, 4);
+    .slice(0, 5);
 
   return (
-    <header className="site-header">
+    <header className={`site-header${isMenuOpen ? " is-menu-open" : ""}`}>
       <div className="site-header__inner">
         <div className="site-header__left">
-          <Link className="brand" href="/" aria-label="One World home">
-            <span className="brand__title">ADAMTECH</span>
+          <Link className="brand" href="/" aria-label={`${brandName} home`}>
+            {logoSrc?.trim() ? (
+              <img
+                className="brand__logo"
+                src={logoSrc}
+                alt={brandName}
+                width={220}
+                height={40}
+                decoding="async"
+              />
+            ) : (
+              <span className="brand__title">
+                <span className="brand__name">Adam</span>
+                <span className="brand__suffix"> Technology</span>
+              </span>
+            )}
           </Link>
         </div>
 
@@ -67,8 +85,9 @@ export default function SiteHeader({
         >
           {displayNavItems.map((item) => {
             const active = isActive(pathname, item.href);
+            const NavLink = item.href.includes("#") ? HashLink : Link;
             return (
-              <Link
+              <NavLink
                 key={item.label}
                 className={`site-nav__link${active ? " site-nav__link--active" : ""}`}
                 href={item.href}
@@ -77,10 +96,9 @@ export default function SiteHeader({
               >
                 {item.label}
                 {active && <span className="underline" />}
-              </Link>
+              </NavLink>
             );
-          })}
-        </nav>
+          })}        </nav>
 
         <button
           className={`menu-toggle${isMenuOpen ? " is-open" : ""}`}
@@ -98,14 +116,13 @@ export default function SiteHeader({
         </button>
 
         <div className="site-header__actions">
-          <span className="header-badge">DUBAI LICENSED</span>
           <Link
             href="/contact"
             className="header-button"
             aria-label="Inquire"
             onClick={() => setIsMenuOpen(false)}
           >
-            INQUIRE
+            Inquire
           </Link>
         </div>
 

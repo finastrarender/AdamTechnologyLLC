@@ -3,12 +3,16 @@ import "../styles.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "ONE WORLD CAPITAL CLUB LLCE",
-    template: "%s | OWCC LLC",
+    default: "Adam Technology L.L.C.",
+    template: "%s | Adam Technology L.L.C.",
   },
   description:
-    "ONE WORLD CAPITAL CLUB LLC — trading, investment, and corporate solutions within the UAE free zone ecosystem.",
+    "Adam Technology L.L.C. delivers enterprise-grade cybersecurity, cloud & data infrastructure, and custom software engineering from Dubai, UAE.",
   metadataBase: new URL(process.env.AUTH_URL ?? "http://localhost:3000"),
+  icons: {
+    icon: [{ url: "/favicon.png", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

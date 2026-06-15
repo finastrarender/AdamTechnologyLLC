@@ -2,6 +2,27 @@
  * Static page content when Mongo has no row yet (before `pnpm seed`)
  * or when a slug is missing. Keeps the marketing site usable on first run.
  */
+import { DEFAULT_SERVICES_GRID } from "@/data/services-reference";
+import {
+  ABOUT_ADVANTAGE_SECTION_DEFAULT,
+  ABOUT_HERO_SECTION_DEFAULT,
+  ABOUT_VALUES_SECTION_DEFAULT,
+  ABOUT_VISION_MISSION_SECTION_DEFAULT,
+  CONTACT_INQUIRY_SECTION_DEFAULT,
+  CTA_SECTION_DEFAULT,
+  HERO_SECTION_DEFAULT,
+  INTRO_SECTION_DEFAULT,
+  LEGAL_DOCUMENT_SECTION_DEFAULT,
+  LEGAL_HERO_SECTION_DEFAULT,
+  PRIVACY_DOCUMENT_SECTION_DEFAULT,
+  PRIVACY_HERO_SECTION_DEFAULT,
+  PROJECTS_CAPABILITIES_SECTION_DEFAULT,
+  PROJECTS_HERO_SECTION_DEFAULT,
+  PROJECTS_PORTFOLIO_SECTION_DEFAULT,
+  SERVICES_HERO_SECTION_DEFAULT,
+  SERVICES_SECTION_DEFAULT,
+  WHY_CHOOSE_SECTION_DEFAULT,
+} from "@/data/page-section-defaults";
 import type { PublicPageView } from "@/lib/content/pages";
 import type { PageSection } from "@/types/section";
 
@@ -9,69 +30,7 @@ function sid(slug: string, type: string, order: number): string {
   return `fb-${slug}-${type}-${order}`;
 }
 
-const heroData = {
-  badge: "ENTERPRISE GRADE INTELLIGENCE",
-  title: ["POWERING", "SECURE", "AND", "FUTURE", "TECHNOLOGY"],
-  description:
-    "Adam Technology L.L.C. delivers high-precision digital infrastructure for the modern era. We architect, secure, and scale enterprise systems with industrial-grade resilience.",
-  primaryAction: { label: "EXPLORE SERVICES", href: "/services" },
-  secondaryAction: { label: "BOOK FREE ADVICE", href: "/contact" },
-  backgroundImage: "/home/hero-bg.jpg",
-};
-
-const introData = {
-  eyebrow: "About Us",
-  title: ["Diverse UAE Free Zone", "Strategic Operations"],
-  description:
-    "One World Trade Centre FZE operates at the intersection of global trade and innovation. We provide seamless corporate solutions from our professional headquarters, leveraging the unique economic advantages of the UAE to scale international businesses.",
-  highlights: [
-    "Expertise in multi-jurisdictional licensing",
-    "Direct access to global trade corridors",
-    "High-tier corporate governance and advisory",
-  ],
-  image: "/home/headquarters.png",
-};
-
-const servicesData = {
-  eyebrow: "OUR CAPABILITIES",
-  title: "CORE PILLARS",
-  description:
-    "Modular solutions designed to scale with the complexity of your operational demands.",
-  backgroundImage: "",
-  cards: [
-    {
-      icon: "security",
-      title: "CYBER SECURITY",
-      description:
-        "Defensive architecture and threat intelligence systems built to withstand the most sophisticated breaches.",
-    },
-    {
-      icon: "online",
-      title: "DATA & CLOUD",
-      description:
-        "High-performance cloud migration and sovereign data warehousing for sensitive enterprise assets.",
-    },
-    {
-      icon: "innovation",
-      title: "SOFTWARE & DEV",
-      description:
-        "Custom enterprise software engineered with a security-first methodology and technical excellence.",
-    },
-    {
-      icon: "corporate",
-      title: "CONSULTING",
-      description:
-        "Strategic advisory and specialized workforce training to foster a culture of technological resilience.",
-    },
-  ],
-};
-
-const servicesHeroData = {
-  title: ["SYSTEM", "ARCHITECTURE"],
-  description:
-    "Enterprise-grade technological dominance through modular infrastructure, elite cybersecurity protocols, and bespoke software orchestration.",
-  backgroundImage: "/home/hero-bg.jpg",
-};
+const servicesGridData = DEFAULT_SERVICES_GRID;
 
 const servicesAccordionData = {
   cards: [
@@ -118,68 +77,6 @@ const servicesAccordionData = {
       iconImage: "/home/headquarters.png",
       category: "education",
       points: [],
-    },
-  ],
-};
-
-const servicesGridData = {
-  title: "",
-  description: "",
-  filters: ["ALL"],
-  cards: [
-    {
-      category: "THREAT INTEL",
-      title: "CYBERSECURITY",
-      icon: "security",
-      description:
-        "Proactive threat neutralization and sovereign data protection. We deploy advanced cryptographic standards and real-time mesh monitoring to secure enterprise perimeters.",
-      features: ["THREAT INTEL", "ZERO TRUST", "SOC OPS"],
-      cta: "",
-    },
-    {
-      category: "HYBRID MULTI-CLOUD",
-      title: "DATA & CLOUD",
-      icon: "online",
-      description:
-        "High-availability cloud orchestration. Scalable neural architectures designed for 99.99% uptime and hyper-efficient data throughput.",
-      features: ["HYBRID MULTI-CLOUD", "EDGE COMPUTING"],
-      cta: "",
-    },
-    {
-      category: "MODULAR STACKS",
-      title: "SOFTWARE & DEV",
-      icon: "innovation",
-      description:
-        "Mission-critical application development. Precision-engineered codebase built for speed, modularity, and future-proof scaling.",
-      features: [],
-      cta: "",
-    },
-    {
-      category: "EXECUTIVE ENABLEMENT",
-      title: "CONSULTING & TRAINING",
-      icon: "corporate",
-      description:
-        "Empowering executive leadership through deep-tech audits and specialized personnel upskilling in emerging tech paradigms.",
-      features: [],
-      cta: "",
-    },
-    {
-      category: "Technology",
-      title: "Technology & Innovation",
-      icon: "Monitor",
-      description:
-        "Driving digital transformation through fintech solutions, blockchain integration, and advanced technology consulting.",
-      features: ["Fintech Solutions", "Blockchain Consulting", "Digital Strategy"],
-      cta: "Learn More",
-    },
-    {
-      category: "Specialized",
-      title: "Specialized Consulting",
-      icon: "FlaskConical",
-      description:
-        "Niche expertise in emerging markets, sustainability-focused investments, and unique cross-border trade facilitation.",
-      features: ["ESG Consulting", "Emerging Markets", "Trade Facilitation"],
-      cta: "Learn More",
     },
   ],
 };
@@ -350,27 +247,6 @@ const globalStandardsData = {
   ],
 };
 
-const whyChooseData = {
-  title: "",
-  subheading: "",
-  items: [
-    {
-      icon: "ShieldCheck",
-      title: "END-TO-END SECURITY",
-      description:
-        "We don't just 'treat' security; we build it into the DNA of every solution. From physical server security to encrypted application layers, your data remains impenetrable.",
-      tags: ["ENCRYPTION", "ZERO TRUST", "SOVEREIGN CONTROL"],
-    },
-    {
-      icon: "Sparkles",
-      title: "FUTURE-READY TECH",
-      description:
-        "Anticipating the next decade of digital evolution. Our stacks are built for modularity, ensuring you can integrate AI, Blockchain, and Quantum protocols seamlessly.",
-      tags: ["AI-DRIVEN", "EDGE READY", "SCALABLE MESH"],
-    },
-  ],
-};
-
 const investmentData = {
   id: "investment",
   heading: ["Why Partners Choose", "One World Capital"],
@@ -401,15 +277,8 @@ const investmentData = {
 };
 
 const clientLogosData = {
-  eyebrow: "TRUSTED BY INSTITUTIONAL LEADERS",
-  logos: ["GLOBAL BANK", "TECH LOGISTICS", "DUBAI URBAN", "GOV SECTOR", "CORE ENERGY"],
-};
-
-const ctaData = {
-  title: "SYSTEM DEPLOYMENT STARTS HERE",
-  description:
-    "Secure your digital future with the UAE's premier technical architectural firm.",
-  action: { label: "BOOK CONSULTATION", href: "/contact" },
+  eyebrow: "LICENSED BY DUBAI DEPARTMENT OF ECONOMY & TOURISM",
+  logos: ["FINBANK", "MEDITECH", "DXB_GOV", "SECURE_AE", "ENERGY_CORE", "FINBANK"],
 };
 
 const servicesCtaData = {
@@ -531,152 +400,6 @@ const researchHubData = {
   simulationImage: "/home/hero-bg.jpg",
 };
 
-const aboutHeroData = {
-  titleAccent: "THE DIGITAL",
-  titleMain: "ARCHITECT",
-  description:
-    "Engineering high-precision digital ecosystems for global enterprises. We bridge the gap between industrial reliability and neural-speed innovation.",
-  image: "/home/headquarters.png",
-  stats: [
-    { value: "24+", label: "GLOBAL NETWORKS" },
-    { value: "99.9%", label: "UPTIME GUARANTEE" },
-  ],
-};
-
-const aboutVisionMissionData = {
-  items: [
-    {
-      title: "MISSION",
-      description:
-        "To design and deploy bulletproof infrastructure that empowers the next generation of sovereign enterprise data. We don't just host; we architect resilience.",
-      icon: "Zap",
-      accentColor: "#111927",
-    },
-    {
-      title: "OBJECTIVE",
-      description:
-        "Securing the flow of global digital assets through hardware-first intelligence and cryptographical precision.",
-      icon: "Eye",
-      accentColor: "#34d8ff",
-    },
-  ],
-  vision: {
-    title: "VISION 2030",
-    quote:
-      '"A world where data is as structural and reliable as steel. We envision the total convergence of industrial engineering and digital protocol."',
-    badge: "PROTOCOL ACTIVE",
-  },
-};
-
-const aboutValuesData = {
-  title: "COMPLIANCE AND CERTIFICATIONS",
-  description:
-    "ADAM TECHNOLOGY L.L.C. operates under strict regulatory frameworks, ensuring global compliance and institutional security standards.",
-  region: "DUBAI, UNITED ARAB EMIRATES",
-  items: [
-    {
-      title: "DUBAI LICENSED",
-      description:
-        "Fully registered and regulated by Dubai authorities for technology infrastructure and specialized digital services.",
-      icon: "Award",
-    },
-    {
-      title: "ISO CERTIFIED",
-      description:
-        "Adhering to ISO 27001 standards for information security management and data protection protocols.",
-      icon: "ShieldCheck",
-    },
-    {
-      title: "NIST FRAMEWORK",
-      description:
-        "Implementing NIST cybersecurity framework to provide enterprise-grade threat detection and mitigation.",
-      icon: "Shield",
-    },
-  ],
-  reach: {
-    title: "GLOBAL REACH",
-    image: "/home/hero-bg.jpg",
-    metrics: [
-      { value: "0.4MS", label: "LOCAL LATENCY" },
-      { value: "500PB", label: "DATA MANAGED" },
-      { value: "128-BIT", label: "ENCRYPTION STANDARD" },
-      { value: "24/7", label: "THREAT MONITORING" },
-    ],
-  },
-};
-const contactInquiryData = {
-  heroEyebrow: "PROTOCOL: COMMUNICATION",
-  heroTitleLines: ["CONNECT", "SECURELY"],
-  heroSideCopy:
-    "ENTERPRISE-GRADE COMMUNICATION NODES FOR INDUSTRIAL SCALING AND TECHNOLOGICAL SOVEREIGNTY.",
-  formTitle: "Initialize Inquiry",
-  formDescription: "Complete the transmission parameters below.",
-  submitLabel: "Send Message",
-  formFields: {
-    fullNameLabel: "Identifier / Name",
-    fullNamePlaceholder: "ENTER FULL NAME",
-    companyLabel: "Organization / Company",
-    companyPlaceholder: "ENTER COMPANY NAME",
-    workEmailLabel: "Secure Email Endpoint",
-    workEmailPlaceholder: "EMAIL@DOMAIN.COM",
-    interestLabel: "Operation Type / Service",
-    interestPlaceholder: "SELECT INFRASTRUCTURE MODULE",
-    messageLabel: "Message Payload",
-    messagePlaceholder: "TRANSMIT YOUR REQUIREMENTS...",
-    disclaimerText: "SYSTEM STATUS: READY FOR TRANSMISSION",
-    successMessage: "Thank you — our consultants will be in touch shortly.",
-    errorMessage: "Network error",
-  },
-  inquiryOptions: [
-    "Cybersecurity",
-    "Cloud & Data",
-    "Software Engineering",
-    "Consulting",
-    "Managed Services",
-  ],
-  officeHeading: "Global Operations",
-  officeItems: [
-    {
-      title: "Dubai HQ",
-      lines: [
-        "Business Bay, Citadel Tower Unit 1402",
-        "Dubai, UAE",
-      ],
-      icon: "location",
-    },
-    {
-      title: "Hotline",
-      lines: ["+971 4 555 0192"],
-      icon: "phone",
-    },
-    {
-      title: "Secure Channel",
-      lines: ["ops@adamtech.ae"],
-      icon: "mail",
-    },
-  ],
-  departmentContacts: [
-    {
-      title: "School",
-      subtitle: "Admissions & Academic Affairs",
-      email: "admissions@oneworld.edu",
-    },
-    {
-      title: "Incubator",
-      subtitle: "Startups & Mentorship",
-      email: "startup@oneworld.edu",
-    },
-    {
-      title: "Advisory",
-      subtitle: "Consulting & Corporate",
-      email: "advisory@oneworld.edu",
-    },
-  ],
-  mapImage: "",
-  mapLabelTitle: "",
-  mapLabelSubtitle: "",
-};
-
 function sections(slug: string, list: { type: PageSection["type"]; order: number; data: Record<string, unknown> }[]): PageSection[] {
   return list.map((s) => ({
     id: sid(slug, s.type, s.order),
@@ -695,12 +418,11 @@ const FALLBACK_BY_SLUG: Record<string, PublicPageView> = {
     seoDescription:
       "Adam Technology L.L.C. delivers enterprise-grade cybersecurity, cloud & data infrastructure, and custom software engineering from Dubai, UAE.",
     effectiveSections: sections("home", [
-      { type: "hero", order: 0, data: heroData },
-      { type: "intro", order: 1, data: introData },
-      { type: "services", order: 2, data: servicesData },
-      { type: "whyChoose", order: 3, data: whyChooseData },
-      { type: "clientLogos", order: 4, data: clientLogosData },
-      { type: "cta", order: 5, data: ctaData },
+      { type: "hero", order: 0, data: HERO_SECTION_DEFAULT },
+      { type: "intro", order: 1, data: INTRO_SECTION_DEFAULT },
+      { type: "services", order: 2, data: SERVICES_SECTION_DEFAULT },
+      { type: "whyChoose", order: 3, data: WHY_CHOOSE_SECTION_DEFAULT },
+      { type: "cta", order: 4, data: CTA_SECTION_DEFAULT },
     ]),
     isPreview: false,
   },
@@ -712,9 +434,10 @@ const FALLBACK_BY_SLUG: Record<string, PublicPageView> = {
     seoDescription:
       "Learn about Adam Technology L.L.C. and our security-first approach to building and operating modern digital infrastructure.",
     effectiveSections: sections("about", [
-      { type: "aboutHero", order: 0, data: aboutHeroData },
-      { type: "aboutVisionMission", order: 1, data: aboutVisionMissionData },
-      { type: "aboutValues", order: 2, data: aboutValuesData },
+      { type: "aboutHero", order: 0, data: ABOUT_HERO_SECTION_DEFAULT },
+      { type: "aboutVisionMission", order: 1, data: ABOUT_VISION_MISSION_SECTION_DEFAULT },
+      { type: "aboutValues", order: 2, data: ABOUT_VALUES_SECTION_DEFAULT },
+      { type: "aboutAdvantage", order: 3, data: ABOUT_ADVANTAGE_SECTION_DEFAULT },
     ]),
     isPreview: false,
   },
@@ -725,9 +448,8 @@ const FALLBACK_BY_SLUG: Record<string, PublicPageView> = {
     seoTitle: "Services | Adam Technology L.L.C.",
     seoDescription: "Explore our cybersecurity, cloud & data, and software engineering services.",
     effectiveSections: sections("services", [
-      { type: "servicesHero", order: 0, data: servicesHeroData },
+      { type: "servicesHero", order: 0, data: SERVICES_HERO_SECTION_DEFAULT },
       { type: "servicesGrid", order: 1, data: servicesGridData },
-      { type: "servicesCTA", order: 2, data: servicesCtaData },
     ]),
     isPreview: false,
   },
@@ -738,7 +460,47 @@ const FALLBACK_BY_SLUG: Record<string, PublicPageView> = {
     seoTitle: "Contact | Adam Technology L.L.C.",
     seoDescription: "Contact Adam Technology L.L.C. for secure, enterprise-grade cybersecurity and infrastructure support.",
     effectiveSections: sections("contact", [
-      { type: "contactInquiry", order: 0, data: contactInquiryData },
+      { type: "contactInquiry", order: 0, data: CONTACT_INQUIRY_SECTION_DEFAULT },
+    ]),
+    isPreview: false,
+  },
+  project: {
+    slug: "project",
+    title: "Projects",
+    status: "published",
+    seoTitle: "Projects | Adam Technology L.L.C.",
+    seoDescription:
+      "Explore Adam Technology case studies in cybersecurity, cloud infrastructure, and blockchain solutions for global enterprises.",
+    effectiveSections: sections("project", [
+      { type: "projectsHero", order: 0, data: PROJECTS_HERO_SECTION_DEFAULT },
+      { type: "projectsCapabilities", order: 1, data: PROJECTS_CAPABILITIES_SECTION_DEFAULT },
+      { type: "projectsPortfolio", order: 2, data: PROJECTS_PORTFOLIO_SECTION_DEFAULT },
+    ]),
+    isPreview: false,
+  },
+  terms: {
+    slug: "terms",
+    title: "Terms & Conditions",
+    status: "published",
+    seoTitle: "Terms & Conditions | Adam Technology L.L.C.",
+    seoDescription:
+      "Read the Terms of Use governing access to and use of the Adam Technology website.",
+    effectiveSections: sections("terms", [
+      { type: "legalHero", order: 0, data: LEGAL_HERO_SECTION_DEFAULT },
+      { type: "legalDocument", order: 1, data: LEGAL_DOCUMENT_SECTION_DEFAULT },
+    ]),
+    isPreview: false,
+  },
+  privacy: {
+    slug: "privacy",
+    title: "Privacy Policy",
+    status: "published",
+    seoTitle: "Privacy Policy | Adam Technology L.L.C.",
+    seoDescription:
+      "Read how Adam Technology collects, uses, and protects personal data across our website and services.",
+    effectiveSections: sections("privacy", [
+      { type: "legalHero", order: 0, data: PRIVACY_HERO_SECTION_DEFAULT },
+      { type: "legalDocument", order: 1, data: PRIVACY_DOCUMENT_SECTION_DEFAULT },
     ]),
     isPreview: false,
   },

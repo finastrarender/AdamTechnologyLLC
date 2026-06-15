@@ -3,14 +3,20 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ImageUploadField from "@/components/admin/ImageUploadField";
+import FooterSocialIconPicker from "@/components/admin/FooterSocialIconPicker";
+import {
+  defaultFooterColumns,
+  defaultFooterMeta,
+  defaultFooterCompanyColumn,
+  defaultFooterServicesColumn,
+  type FooterLinkColumn,
+} from "@/data/site-defaults";
 
 type NavItem = { label: string; href: string };
 type PageSummary = { slug: string; title: string };
 type FooterLink = { label: string; href: string };
-type ContactRow = { type: "location" | "phone" | "mail"; value: string };
 type FooterMetaLink = { label: string; href: string; icon?: string };
-type FooterLinkColumn = { title: string; links: FooterLink[] };
-type FooterContactColumn = { title: string; contact: ContactRow[] };
+type FooterContactColumn = { title: string; contact: Array<{ type: "location" | "phone" | "mail"; value: string }> };
 type FooterColumn = FooterLinkColumn | FooterContactColumn;
 
 function formatMetaLinks(items: Array<string | FooterMetaLink>, fallbackHref: string) {
@@ -38,7 +44,9 @@ function toEditableSocialLinks(items: Array<string | FooterMetaLink>): FooterMet
     })
     .filter((item) => item.label || item.href || item.icon);
 
-  return normalized.length > 0 ? normalized : [{ icon: "globe", label: "", href: "/contact" }];
+  return normalized.length > 0
+    ? normalized
+    : (defaultFooterMeta.social as FooterMetaLink[]);
 }
 
 function parseLegalMetaLinks(input: string): FooterMetaLink[] {
@@ -60,16 +68,24 @@ function isLinkColumn(column: FooterColumn): column is FooterLinkColumn {
   return "links" in column;
 }
 
-function emptyLinkColumn(): FooterLinkColumn {
-  return { title: "", links: [{ label: "", href: "" }] };
-}
+function normalizeLoadedFooterColumns(columns: FooterColumn[]): FooterLinkColumn[] {
+  const linkColumns = columns.filter(isLinkColumn);
 
-function emptyContactColumn(): FooterContactColumn {
-  return { title: "", contact: [{ type: "location", value: "" }] };
-}
+  const resolve = (title: string, fallback: FooterLinkColumn) => {
+    const match = linkColumns.find(
+      (column) => column.title.trim().toLowerCase() === title.toLowerCase(),
+    );
+    if (match && match.links.some((link) => link.label.trim())) {
+      return match;
+    }
+    return structuredClone(fallback);
+  };
 
-function getPageHref(page: PageSummary) {
-  return page.slug === "home" ? "/" : `/${page.slug}`;
+  if (linkColumns.length === 0) {
+    return structuredClone(defaultFooterColumns);
+  }
+
+  return [resolve("Services", defaultFooterServicesColumn), resolve("Company", defaultFooterCompanyColumn)];
 }
 
 export default function SiteGlobalEditClient() {
@@ -79,19 +95,21 @@ export default function SiteGlobalEditClient() {
   const [navItems, setNavItems] = useState<NavItem[]>([]);
   const [pages, setPages] = useState<PageSummary[]>([]);
   const [logoSrc, setLogoSrc] = useState("");
-  const [footerColumns, setFooterColumns] = useState<FooterColumn[]>([]);
+  const [footerColumns, setFooterColumns] = useState<FooterLinkColumn[]>(defaultFooterColumns);
   const [brand, setBrand] = useState("");
-  const [description, setDescription] = useState("");
-  const [copyright, setCopyright] = useState("");
+  const [description, setDescription] = useState(defaultFooterMeta.description);
+  const [officeAddress, setOfficeAddress] = useState(defaultFooterMeta.officeAddress);
+  const [copyright, setCopyright] = useState(defaultFooterMeta.copyright);
   const [seoDefaultTitle, setSeoDefaultTitle] = useState("Adam Technology L.L.C.");
   const [seoDefaultDescription, setSeoDefaultDescription] = useState(
     "Adam Technology L.L.C. delivers enterprise-grade cybersecurity, cloud & data infrastructure, and custom software engineering from Dubai, UAE.",
   );
-  const [socialLinks, setSocialLinks] = useState<FooterMetaLink[]>([
-    { icon: "globe", label: "", href: "/contact" },
-  ]);
+  const [socialLinks, setSocialLinks] = useState<FooterMetaLink[]>(
+    defaultFooterMeta.social as FooterMetaLink[],
+  );
   const [legalLinks, setLegalLinks] = useState("");
   const [clientLogosFlag, setClientLogosFlag] = useState(true);
+  const [footerLogoLightFilter, setFooterLogoLightFilter] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -107,16 +125,18 @@ export default function SiteGlobalEditClient() {
         if (cancelled) return;
         setNavItems(d.navItems ?? []);
         setPages((pagesJson.data ?? []) as PageSummary[]);
-        setLogoSrc(d.logoSrc ?? "/home/logo.png");
-        setFooterColumns((d.footerColumns ?? []) as FooterColumn[]);
-        setBrand(d.footerMeta?.brand ?? "");
-        setDescription(d.footerMeta?.description ?? "");
-        setCopyright(d.footerMeta?.copyright ?? "");
+        setLogoSrc(d.logoSrc ?? "");
+        setFooterColumns(normalizeLoadedFooterColumns((d.footerColumns ?? []) as FooterColumn[]));
+        setBrand(d.footerMeta?.brand ?? defaultFooterMeta.brand);
+        setDescription(d.footerMeta?.description ?? defaultFooterMeta.description);
+        setOfficeAddress(d.footerMeta?.officeAddress ?? defaultFooterMeta.officeAddress);
+        setCopyright(d.footerMeta?.copyright ?? defaultFooterMeta.copyright);
         setSocialLinks(
           toEditableSocialLinks((d.footerMeta?.social ?? []) as Array<string | FooterMetaLink>),
         );
         setLegalLinks(formatMetaLinks((d.footerMeta?.legal ?? []) as Array<string | FooterMetaLink>, "/contact"));
         setClientLogosFlag(d.featureFlags?.clientLogos !== false);
+        setFooterLogoLightFilter(d.featureFlags?.footerLogoLightFilter !== false);
         setSeoDefaultTitle(d.seoDefaults?.defaultTitle ?? "Adam Technology L.L.C.");
         setSeoDefaultDescription(
           d.seoDefaults?.defaultDescription ??
@@ -152,7 +172,7 @@ export default function SiteGlobalEditClient() {
   function updateFooterColumnTitle(index: number, title: string) {
     setFooterColumns((prev) => {
       const next = [...prev];
-      next[index] = { ...next[index], title } as FooterColumn;
+      next[index] = { ...next[index], title };
       return next;
     });
   }
@@ -166,7 +186,7 @@ export default function SiteGlobalEditClient() {
     setFooterColumns((prev) => {
       const next = [...prev];
       const column = next[columnIndex];
-      if (!column || !isLinkColumn(column)) return prev;
+      if (!column) return prev;
       const links = [...column.links];
       links[linkIndex] = { ...links[linkIndex], [field]: value };
       next[columnIndex] = { ...column, links };
@@ -178,7 +198,7 @@ export default function SiteGlobalEditClient() {
     setFooterColumns((prev) => {
       const next = [...prev];
       const column = next[columnIndex];
-      if (!column || !isLinkColumn(column)) return prev;
+      if (!column) return prev;
       next[columnIndex] = {
         ...column,
         links: [...column.links, { label: "", href: "" }],
@@ -191,7 +211,7 @@ export default function SiteGlobalEditClient() {
     setFooterColumns((prev) => {
       const next = [...prev];
       const column = next[columnIndex];
-      if (!column || !isLinkColumn(column)) return prev;
+      if (!column) return prev;
       const links = column.links.filter((_, index) => index !== linkIndex);
       next[columnIndex] = {
         ...column,
@@ -199,64 +219,6 @@ export default function SiteGlobalEditClient() {
       };
       return next;
     });
-  }
-
-  function updateFooterContact(
-    columnIndex: number,
-    rowIndex: number,
-    field: keyof ContactRow,
-    value: string,
-  ) {
-    setFooterColumns((prev) => {
-      const next = [...prev];
-      const column = next[columnIndex];
-      if (!column || isLinkColumn(column)) return prev;
-      const contact = [...column.contact];
-      contact[rowIndex] = {
-        ...contact[rowIndex],
-        [field]: value,
-      } as ContactRow;
-      next[columnIndex] = { ...column, contact };
-      return next;
-    });
-  }
-
-  function addFooterContactRow(columnIndex: number) {
-    setFooterColumns((prev) => {
-      const next = [...prev];
-      const column = next[columnIndex];
-      if (!column || isLinkColumn(column)) return prev;
-      next[columnIndex] = {
-        ...column,
-        contact: [...column.contact, { type: "location", value: "" }],
-      };
-      return next;
-    });
-  }
-
-  function removeFooterContactRow(columnIndex: number, rowIndex: number) {
-    setFooterColumns((prev) => {
-      const next = [...prev];
-      const column = next[columnIndex];
-      if (!column || isLinkColumn(column)) return prev;
-      const contact = column.contact.filter((_, index) => index !== rowIndex);
-      next[columnIndex] = {
-        ...column,
-        contact: contact.length > 0 ? contact : [{ type: "location", value: "" }],
-      };
-      return next;
-    });
-  }
-
-  function addFooterColumn(kind: "links" | "contact") {
-    setFooterColumns((prev) => [
-      ...prev,
-      kind === "links" ? emptyLinkColumn() : emptyContactColumn(),
-    ]);
-  }
-
-  function removeFooterColumn(index: number) {
-    setFooterColumns((prev) => prev.filter((_, columnIndex) => columnIndex !== index));
   }
 
   function updateSocialLink(index: number, field: keyof FooterMetaLink, value: string) {
@@ -268,13 +230,13 @@ export default function SiteGlobalEditClient() {
   }
 
   function addSocialLink() {
-    setSocialLinks((prev) => [...prev, { icon: "globe", label: "", href: "/contact" }]);
+    setSocialLinks((prev) => [...prev, { icon: "globe", label: "", href: "" }]);
   }
 
   function removeSocialLink(index: number) {
     setSocialLinks((prev) => {
       const next = prev.filter((_, itemIndex) => itemIndex !== index);
-      return next.length > 0 ? next : [{ icon: "globe", label: "", href: "/contact" }];
+      return next.length > 0 ? next : (defaultFooterMeta.social as FooterMetaLink[]);
     });
   }
 
@@ -285,11 +247,18 @@ export default function SiteGlobalEditClient() {
     const body = {
       navItems,
       logoSrc,
-      footerColumns: [],
+      footerColumns,
       footerMeta: {
         brand,
-        description: "",
-        social: [],
+        description,
+        officeAddress,
+        social: socialLinks
+          .map((item) => ({
+            icon: item.icon || "globe",
+            label: item.label.trim(),
+            href: item.href.trim(),
+          }))
+          .filter((item) => item.href),
         copyright,
         legal: parseLegalMetaLinks(legalLinks),
       },
@@ -297,7 +266,10 @@ export default function SiteGlobalEditClient() {
         defaultTitle: seoDefaultTitle || undefined,
         defaultDescription: seoDefaultDescription || undefined,
       },
-      featureFlags: { clientLogos: clientLogosFlag },
+      featureFlags: {
+        clientLogos: clientLogosFlag,
+        footerLogoLightFilter,
+      },
     };
     try {
       const res = await fetch("/api/v1/admin/site-global", {
@@ -381,22 +353,124 @@ export default function SiteGlobalEditClient() {
           >
             Add nav item
           </button>
-          <h2>Logo</h2>
+          <h2>Site logo</h2>
+          <p className="admin-muted" style={{ marginTop: 0 }}>
+            Shown in the site header and footer. Upload a PNG, SVG, or WebP with a transparent
+            background for best results.
+          </p>
           <ImageUploadField
-            label="Logo URL"
+            label="Logo image"
             value={logoSrc}
             onChange={setLogoSrc}
             folder="site-global/logo"
+            placeholder="/site-global/logo/adam-technology-logo.svg"
           />
-          <h2>Footer meta</h2>
-          <p className="admin-muted" style={{ marginTop: 0 }}>
-            Footer style is fixed to match the approved design. Edit brand, copyright, and legal
-            links only.
-          </p>
           <label>
-            Brand
-            <input value={brand} onChange={(e) => setBrand(e.target.value)} />
+            Logo alt text
+            <input
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+              placeholder="Adam Technology"
+            />
           </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12 }}>
+            <input
+              type="checkbox"
+              checked={footerLogoLightFilter}
+              onChange={(e) => setFooterLogoLightFilter(e.target.checked)}
+            />
+            Lighten footer logo on dark background
+          </label>
+          <p className="admin-muted" style={{ marginTop: 8 }}>
+            Applies a white filter to the logo in the footer only. Turn off if you upload a
+            light-colored logo designed for the navy footer.
+          </p>
+          <h2>Footer</h2>
+          <p className="admin-muted" style={{ marginTop: 0 }}>
+            Matches the approved site footer: company tagline, Services and Company columns, office
+            address, social icons, copyright, and legal links.
+          </p>
+
+          <label>
+            Company tagline
+            <textarea
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={defaultFooterMeta.description}
+            />
+          </label>
+
+          {footerColumns.map((column, columnIndex) => (
+            <div
+              key={`footer-column-${column.title}-${columnIndex}`}
+              className="admin-section-group"
+              style={{ marginTop: 16 }}
+            >
+              <h4>{columnIndex === 0 ? "Services column" : "Company column"}</h4>
+              <label>
+                Column title
+                <input
+                  value={column.title}
+                  onChange={(e) => updateFooterColumnTitle(columnIndex, e.target.value)}
+                  placeholder={columnIndex === 0 ? "Services" : "Company"}
+                />
+              </label>
+              {column.links.map((link, linkIndex) => (
+                <div
+                  key={`footer-link-${columnIndex}-${linkIndex}`}
+                  style={{
+                    display: "grid",
+                    gap: 8,
+                    marginBottom: 12,
+                    padding: 12,
+                    border: "1px solid #e2e8f0",
+                    borderRadius: 12,
+                  }}
+                >
+                  <input
+                    value={link.label}
+                    onChange={(e) => updateFooterLink(columnIndex, linkIndex, "label", e.target.value)}
+                    placeholder="Link label"
+                  />
+                  <input
+                    value={link.href}
+                    onChange={(e) => updateFooterLink(columnIndex, linkIndex, "href", e.target.value)}
+                    placeholder="/services"
+                  />
+                  <button
+                    type="button"
+                    className="admin-button-secondary"
+                    onClick={() => removeFooterLink(columnIndex, linkIndex)}
+                    disabled={column.links.length === 1}
+                  >
+                    Remove link
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="admin-button-secondary"
+                onClick={() => addFooterLink(columnIndex)}
+              >
+                Add link
+              </button>
+            </div>
+          ))}
+
+          <label>
+            Office address
+            <textarea
+              rows={3}
+              value={officeAddress}
+              onChange={(e) => setOfficeAddress(e.target.value)}
+              placeholder={defaultFooterMeta.officeAddress}
+            />
+          </label>
+          <p className="admin-muted" style={{ marginTop: 8 }}>
+            Use a comma before &quot;Office 103&quot; to break the address onto two lines in the footer.
+          </p>
+
           <label>
             Copyright
             <input value={copyright} onChange={(e) => setCopyright(e.target.value)} />
@@ -404,12 +478,67 @@ export default function SiteGlobalEditClient() {
           <label>
             Legal links (one per line: label|href)
             <textarea
-              rows={4}
+              rows={3}
               value={legalLinks}
               onChange={(e) => setLegalLinks(e.target.value)}
-              placeholder={"Privacy Policy|/privacy\nTerms of Service|/terms\nSystem Status|/status\nContact|/contact"}
+              placeholder={"Privacy Policy|/privacy\nTerms and conditions|/terms"}
             />
           </label>
+
+          <div className="admin-section-group">
+            <h4>Office social links</h4>
+            <p className="admin-muted" style={{ marginTop: 0 }}>
+              Circular icons shown under the Office column. Use Website and Instagram to match the
+              reference design.
+            </p>
+            {socialLinks.map((link, index) => (
+              <div
+                key={`social-${index}`}
+                style={{
+                  marginBottom: 16,
+                  padding: 16,
+                  border: "1px solid #e2e8f0",
+                  borderRadius: 12,
+                }}
+              >
+                <label>
+                  Icon
+                  <FooterSocialIconPicker
+                    value={link.icon}
+                    onChange={(value) => updateSocialLink(index, "icon", value)}
+                  />
+                </label>
+                <label>
+                  Accessible label
+                  <input
+                    value={link.label}
+                    onChange={(e) => updateSocialLink(index, "label", e.target.value)}
+                    placeholder="LinkedIn"
+                  />
+                </label>
+                <label>
+                  Link URL
+                  <input
+                    value={link.href}
+                    onChange={(e) => updateSocialLink(index, "href", e.target.value)}
+                    placeholder="https://www.linkedin.com/company/adamtechnology"
+                  />
+                </label>
+                <button
+                  type="button"
+                  className="admin-button-secondary"
+                  onClick={() => removeSocialLink(index)}
+                  disabled={socialLinks.length === 1}
+                >
+                  Remove social link
+                </button>
+              </div>
+            ))}
+            <button type="button" className="admin-button-secondary" onClick={addSocialLink}>
+              Add social link
+            </button>
+          </div>
+
           <h2>Feature flags</h2>
           <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <input
@@ -426,7 +555,11 @@ export default function SiteGlobalEditClient() {
           </p>
           <label>
             Default SEO title
-            <input value={seoDefaultTitle} onChange={(e) => setSeoDefaultTitle(e.target.value)} />
+            <input
+              value={seoDefaultTitle}
+              onChange={(e) => setSeoDefaultTitle(e.target.value)}
+              placeholder="Adam Technology L.L.C."
+            />
           </label>
           <label>
             Default SEO description
@@ -434,6 +567,7 @@ export default function SiteGlobalEditClient() {
               rows={3}
               value={seoDefaultDescription}
               onChange={(e) => setSeoDefaultDescription(e.target.value)}
+              placeholder="Adam Technology L.L.C. delivers enterprise-grade cybersecurity, cloud & data infrastructure, and custom software engineering from Dubai, UAE."
             />
           </label>
           <button type="submit" disabled={saving}>

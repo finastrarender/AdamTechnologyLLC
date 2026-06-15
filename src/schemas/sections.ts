@@ -22,14 +22,26 @@ const footerContactColumnSchema = z.object({
   ),
 });
 
-export const heroDataSchema = z.object({
-  badge: z.string().optional(),
-  title: z.array(z.string()),
-  description: z.string(),
-  primaryAction: z.object({ label: z.string(), href: z.string() }),
-  secondaryAction: z.object({ label: z.string(), href: z.string() }),
-  backgroundImage: z.string(),
-});
+export const heroDataSchema = z
+  .object({
+    badge: z.string().optional(),
+    title: z.array(z.string()),
+    description: z.string(),
+    highlights: z.array(z.string()).optional(),
+    primaryAction: z.object({ label: z.string(), href: z.string() }),
+    secondaryAction: z.object({ label: z.string(), href: z.string() }),
+    visualImage: z.string().optional(),
+    backgroundImage: z.string().optional(),
+  })
+  .transform((data) => ({
+    badge: data.badge,
+    title: data.title,
+    description: data.description,
+    highlights: data.highlights?.map((item) => item.trim()).filter(Boolean),
+    primaryAction: data.primaryAction,
+    secondaryAction: data.secondaryAction,
+    visualImage: data.visualImage?.trim() || "/home/hero-visual.png",
+  }));
 
 export const introDataSchema = z.object({
   eyebrow: z.string(),
@@ -39,6 +51,7 @@ export const introDataSchema = z.object({
   image: z.string(),
   more: z.string().optional(),
   href: z.string(),
+  buttonLabel: z.string().optional(),
   icon: z.string().optional(),
   expcount: z.number(),
   // exptext: z.string(),
@@ -97,20 +110,31 @@ export const servicesAccordionDataSchema = z.object({
   cards: z.array(serviceCardSchema).min(1),
 });
 
-const servicesGridCardSchema = z.object({
-  category: z.string(),
+const servicesGridFeatureGroupSchema = z.object({
+  label: z.string(),
+  items: z.array(z.string()),
+});
+
+export const servicesGridCardReferenceSchema = z.object({
   title: z.string(),
   description: z.string(),
-  features: z.array(z.string()),
-  cta: z.string(),
   icon: z.string().optional(),
+  image: z.string().optional(),
+  features: z.array(z.string()).optional(),
+  tags: z.array(z.string()).optional(),
+  tagsLabel: z.string().optional(),
+  featureGroups: z.array(servicesGridFeatureGroupSchema).optional(),
+  ctaLabel: z.string().optional(),
+  ctaHref: z.string().optional(),
+  ctaHighlighted: z.boolean().optional(),
 });
 
 export const servicesGridDataSchema = z.object({
-  title: z.string(),
-  description: z.string(),
-  filters: z.array(z.string()).min(1),
-  cards: z.array(servicesGridCardSchema).min(1),
+  cybersecurity: servicesGridCardReferenceSchema,
+  cloud: servicesGridCardReferenceSchema,
+  data: servicesGridCardReferenceSchema,
+  blockchain: servicesGridCardReferenceSchema,
+  software: servicesGridCardReferenceSchema,
 });
 
 export const servicesCtaDataSchema = z.object({
@@ -276,6 +300,29 @@ export const contactHeroDataSchema = z.object({
   backgroundImage: z.string(),
 });
 
+export const legalDocumentSectionSchema = z.object({
+  title: z.string(),
+  paragraphs: z.array(z.string()),
+  introBeforeBullets: z.string().optional(),
+  bullets: z.array(z.string()).optional(),
+  outroAfterBullets: z.string().optional(),
+  contact: z
+    .object({
+      companyName: z.string(),
+      email: z.string(),
+      phone: z.string(),
+    })
+    .optional(),
+});
+
+export const legalHeroDataSchema = z.object({
+  title: z.string(),
+});
+
+export const legalDocumentDataSchema = z.object({
+  sections: z.array(legalDocumentSectionSchema).min(1),
+});
+
 export const industriesHeroDataSchema = z.object({
   badge: z.string(),
   title: z.array(z.string()).min(1),
@@ -351,13 +398,55 @@ export const contactInquiryDataSchema = z.object({
   officeItems: z.array(contactInfoItemSchema),
   departmentContacts: z.array(contactDepartmentSchema).optional(),
   formFields: contactFormFieldsSchema.optional(),
-  mapImage: z.string(),
+  mapImage: z.string().optional(),
+  mapEmbedUrl: z.string().optional(),
   mapLabelTitle: z.string(),
   mapLabelSubtitle: z.string(),
 });
 export const serviceHeroDataSchema = z.object({
-  title: z.array(z.string()).min(1),
+  eyebrow: z.string().optional(),
+  title: z.union([z.string(), z.array(z.string()).min(1)]),
   description: z.string(),
+  backgroundImage: z.string().optional(),
+});
+
+const projectsCapabilityItemSchema = z.object({
+  icon: z.string().optional(),
+  title: z.string(),
+  description: z.string(),
+});
+
+export const projectsHeroDataSchema = z.object({
+  titleLines: z.array(z.string()).min(1),
+  description: z.string(),
+  action: z.object({ label: z.string(), href: z.string() }),
+  backgroundImage: z.string().optional(),
+});
+
+export const projectsCapabilitiesDataSchema = z.object({
+  title: z.string(),
+  items: z.array(projectsCapabilityItemSchema).min(1),
+});
+
+const projectsPortfolioMetricSchema = z.object({
+  value: z.string(),
+  label: z.string(),
+});
+
+const projectsPortfolioItemSchema = z.object({
+  badge: z.string(),
+  title: z.string(),
+  image: z.string(),
+  challengeLabel: z.string().optional(),
+  challenge: z.string(),
+  solutionLabel: z.string().optional(),
+  solution: z.string(),
+  metrics: z.array(projectsPortfolioMetricSchema).min(2).max(2),
+  reverse: z.boolean().optional(),
+});
+
+export const projectsPortfolioDataSchema = z.object({
+  items: z.array(projectsPortfolioItemSchema).min(1),
 });
 
 export const aboutHeroDataSchema = z.object({
@@ -407,7 +496,15 @@ const aboutContentCardSchema = z.object({
   accentColor: z.string(),
 });
 
+const aboutCompanyOverviewSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  subDescription: z.string().optional(),
+  image: z.string(),
+});
+
 export const aboutVisionMissionDataSchema = z.object({
+  overview: aboutCompanyOverviewSchema.optional(),
   items: z.array(aboutContentCardSchema).min(1),
   vision: z
     .object({
@@ -425,6 +522,12 @@ export const aboutVisionMissionDataSchema = z.object({
     .optional(),
 });
 
+const aboutAdvantageItemSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  icon: z.string().optional(),
+});
+
 const aboutFrameworkPillarSchema = z.object({
   letter: z.string(),
   title: z.string(),
@@ -438,11 +541,12 @@ export const aboutFrameworkDataSchema = z.object({
 });
 
 export const aboutAdvantageDataSchema = z.object({
-  eyebrow: z.string(),
-  title: z.array(z.string()),
-  description: z.string(),
-  points: z.array(z.string()),
-  image: z.string(),
+  title: z.union([z.string(), z.array(z.string())]),
+  description: z.string().optional(),
+  items: z.array(aboutAdvantageItemSchema).optional(),
+  eyebrow: z.string().optional(),
+  points: z.array(z.string()).optional(),
+  image: z.string().optional(),
 });
 
 const aboutValueItemSchema = z.object({
@@ -530,6 +634,9 @@ const sectionDataValidators: Record<string, z.ZodType<unknown>> = {
   contactHero: contactHeroDataSchema,
   contactInquiry: contactInquiryDataSchema,
   servicesHero: serviceHeroDataSchema,
+  projectsHero: projectsHeroDataSchema,
+  projectsCapabilities: projectsCapabilitiesDataSchema,
+  projectsPortfolio: projectsPortfolioDataSchema,
   industriesHero: industriesHeroDataSchema,
   industriesGrid: industriesGridDataSchema,
   industriesCta: industriesCtaDataSchema,
@@ -545,6 +652,8 @@ const sectionDataValidators: Record<string, z.ZodType<unknown>> = {
   aboutValues: aboutValuesDataSchema,
   aboutCTA: aboutCtaDataSchema,
   researchHub: researchHubDataSchema,
+  legalHero: legalHeroDataSchema,
+  legalDocument: legalDocumentDataSchema,
 };
 
 export function parseSectionData(type: string, data: unknown): unknown {
@@ -582,6 +691,7 @@ export const siteGlobalPayloadSchema = z.object({
   footerMeta: z.object({
     brand: z.string(),
     description: z.string(),
+    officeAddress: z.string().optional(),
     social: z.array(
       z.union([
         z.string(),
