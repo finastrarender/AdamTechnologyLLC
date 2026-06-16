@@ -102,6 +102,7 @@ export default function ApplyNowModalEditClient() {
           legal: [],
         },
         logoSrc: currentJson.data?.logoSrc,
+        headerMeta: currentJson.data?.headerMeta,
         featureFlags: currentJson.data?.featureFlags,
         seoDefaults: currentJson.data?.seoDefaults,
         applyNowModal: {

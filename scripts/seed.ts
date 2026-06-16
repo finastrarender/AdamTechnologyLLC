@@ -39,6 +39,7 @@ import {
   defaultApplyNowModal,
   defaultFooterColumns,
   defaultFooterMeta,
+  defaultHeaderMeta,
 } from "../src/data/site-defaults";
 
 const uri = process.env.MONGODB_URI;
@@ -444,6 +445,7 @@ async function main() {
         footerColumns,
         footerMeta,
         logoSrc: "",
+        headerMeta: defaultHeaderMeta,
         featureFlags: { clientLogos: true, footerLogoLightFilter: true },
         applyNowModal: defaultApplyNowModal,
         seoDefaults: {

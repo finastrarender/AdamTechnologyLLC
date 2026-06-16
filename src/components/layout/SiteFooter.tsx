@@ -73,6 +73,7 @@ export default function SiteFooter({
     brand: string;
     description: string;
     officeAddress?: string;
+    officeTitle?: string;
     social: Array<string | FooterMetaLink>;
     copyright: string;
     legal: Array<string | FooterMetaLink>;
@@ -83,6 +84,7 @@ export default function SiteFooter({
   const brand = meta.brand?.trim() || defaultFooterMeta.brand;
   const description = meta.description?.trim() || defaultFooterMeta.description;
   const officeAddress = meta.officeAddress?.trim() || defaultFooterMeta.officeAddress;
+  const officeTitle = meta.officeTitle?.trim() || defaultFooterMeta.officeTitle;
   const copyright = meta.copyright?.trim() || defaultFooterMeta.copyright;
   const servicesColumn = resolveLinkColumn(columns, "Services", defaultFooterServicesColumn);
   const companyColumn = resolveLinkColumn(columns, "Company", defaultFooterCompanyColumn);
@@ -139,7 +141,7 @@ export default function SiteFooter({
           </nav>
 
           <div className="site-footer__column site-footer__office">
-            <h2>Office</h2>
+            <h2>{officeTitle}</h2>
             <p>
               {officeLines.map((line, index) => (
                 <span key={`${line}-${index}`}>

@@ -9,6 +9,7 @@ import {
   defaultFooterMeta,
   defaultFooterCompanyColumn,
   defaultFooterServicesColumn,
+  defaultHeaderMeta,
   type FooterLinkColumn,
 } from "@/data/site-defaults";
 
@@ -95,10 +96,13 @@ export default function SiteGlobalEditClient() {
   const [navItems, setNavItems] = useState<NavItem[]>([]);
   const [pages, setPages] = useState<PageSummary[]>([]);
   const [logoSrc, setLogoSrc] = useState("");
+  const [inquireLabel, setInquireLabel] = useState(defaultHeaderMeta.inquireLabel);
+  const [inquireHref, setInquireHref] = useState(defaultHeaderMeta.inquireHref);
   const [footerColumns, setFooterColumns] = useState<FooterLinkColumn[]>(defaultFooterColumns);
   const [brand, setBrand] = useState("");
   const [description, setDescription] = useState(defaultFooterMeta.description);
   const [officeAddress, setOfficeAddress] = useState(defaultFooterMeta.officeAddress);
+  const [officeTitle, setOfficeTitle] = useState(defaultFooterMeta.officeTitle);
   const [copyright, setCopyright] = useState(defaultFooterMeta.copyright);
   const [seoDefaultTitle, setSeoDefaultTitle] = useState("Adam Technology L.L.C.");
   const [seoDefaultDescription, setSeoDefaultDescription] = useState(
@@ -126,10 +130,13 @@ export default function SiteGlobalEditClient() {
         setNavItems(d.navItems ?? []);
         setPages((pagesJson.data ?? []) as PageSummary[]);
         setLogoSrc(d.logoSrc ?? "");
+        setInquireLabel(d.headerMeta?.inquireLabel ?? defaultHeaderMeta.inquireLabel);
+        setInquireHref(d.headerMeta?.inquireHref ?? defaultHeaderMeta.inquireHref);
         setFooterColumns(normalizeLoadedFooterColumns((d.footerColumns ?? []) as FooterColumn[]));
         setBrand(d.footerMeta?.brand ?? defaultFooterMeta.brand);
         setDescription(d.footerMeta?.description ?? defaultFooterMeta.description);
         setOfficeAddress(d.footerMeta?.officeAddress ?? defaultFooterMeta.officeAddress);
+        setOfficeTitle(d.footerMeta?.officeTitle ?? defaultFooterMeta.officeTitle);
         setCopyright(d.footerMeta?.copyright ?? defaultFooterMeta.copyright);
         setSocialLinks(
           toEditableSocialLinks((d.footerMeta?.social ?? []) as Array<string | FooterMetaLink>),
@@ -247,11 +254,16 @@ export default function SiteGlobalEditClient() {
     const body = {
       navItems,
       logoSrc,
+      headerMeta: {
+        inquireLabel: inquireLabel.trim(),
+        inquireHref: inquireHref.trim(),
+      },
       footerColumns,
       footerMeta: {
         brand,
         description,
         officeAddress,
+        officeTitle,
         social: socialLinks
           .map((item) => ({
             icon: item.icon || "globe",
@@ -353,6 +365,32 @@ export default function SiteGlobalEditClient() {
           >
             Add nav item
           </button>
+
+          <h2>Header inquire button</h2>
+          <p className="admin-muted" style={{ marginTop: 0 }}>
+            Primary call-to-action shown in the site header on desktop and mobile.
+          </p>
+          <label>
+            Button label
+            <input
+              value={inquireLabel}
+              onChange={(e) => setInquireLabel(e.target.value)}
+              placeholder={defaultHeaderMeta.inquireLabel}
+            />
+          </label>
+          <label>
+            Button link
+            <input
+              value={inquireHref}
+              onChange={(e) => setInquireHref(e.target.value)}
+              placeholder={defaultHeaderMeta.inquireHref}
+            />
+          </label>
+          <p className="admin-muted" style={{ marginTop: 8 }}>
+            Use a page path such as <strong>/contact</strong> or an external URL. Leave the label
+            empty to hide the button.
+          </p>
+
           <h2>Site logo</h2>
           <p className="admin-muted" style={{ marginTop: 0 }}>
             Shown in the site header and footer. Upload a PNG, SVG, or WebP with a transparent
@@ -458,37 +496,37 @@ export default function SiteGlobalEditClient() {
             </div>
           ))}
 
-          <label>
-            Office address
-            <textarea
-              rows={3}
-              value={officeAddress}
-              onChange={(e) => setOfficeAddress(e.target.value)}
-              placeholder={defaultFooterMeta.officeAddress}
-            />
-          </label>
-          <p className="admin-muted" style={{ marginTop: 8 }}>
-            Use a comma before &quot;Office 103&quot; to break the address onto two lines in the footer.
-          </p>
-
-          <label>
-            Copyright
-            <input value={copyright} onChange={(e) => setCopyright(e.target.value)} />
-          </label>
-          <label>
-            Legal links (one per line: label|href)
-            <textarea
-              rows={3}
-              value={legalLinks}
-              onChange={(e) => setLegalLinks(e.target.value)}
-              placeholder={"Privacy Policy|/privacy\nTerms and conditions|/terms"}
-            />
-          </label>
-
-          <div className="admin-section-group">
-            <h4>Office social links</h4>
+          <div className="admin-section-group" style={{ marginTop: 16 }}>
+            <h4>Office column</h4>
             <p className="admin-muted" style={{ marginTop: 0 }}>
-              Circular icons shown under the Office column. Use Website and Instagram to match the
+              Shown in the fourth footer column with the office address and social icons.
+            </p>
+
+            <label>
+              Column title
+              <input
+                value={officeTitle}
+                onChange={(e) => setOfficeTitle(e.target.value)}
+                placeholder={defaultFooterMeta.officeTitle}
+              />
+            </label>
+
+            <label>
+              Office address
+              <textarea
+                rows={4}
+                value={officeAddress}
+                onChange={(e) => setOfficeAddress(e.target.value)}
+                placeholder={defaultFooterMeta.officeAddress}
+              />
+            </label>
+            <p className="admin-muted" style={{ marginTop: 8 }}>
+              Use a comma before &quot;Office 103&quot; to break the address onto two lines in the footer.
+            </p>
+
+            <h4 style={{ marginTop: 20 }}>Office social links</h4>
+            <p className="admin-muted" style={{ marginTop: 0 }}>
+              Circular icons shown under the office address. Use Website and Instagram to match the
               reference design.
             </p>
             {socialLinks.map((link, index) => (
@@ -513,7 +551,7 @@ export default function SiteGlobalEditClient() {
                   <input
                     value={link.label}
                     onChange={(e) => updateSocialLink(index, "label", e.target.value)}
-                    placeholder="LinkedIn"
+                    placeholder="Website"
                   />
                 </label>
                 <label>
@@ -521,7 +559,7 @@ export default function SiteGlobalEditClient() {
                   <input
                     value={link.href}
                     onChange={(e) => updateSocialLink(index, "href", e.target.value)}
-                    placeholder="https://www.linkedin.com/company/adamtechnology"
+                    placeholder="https://www.adamtechnology.ae"
                   />
                 </label>
                 <button
@@ -538,6 +576,20 @@ export default function SiteGlobalEditClient() {
               Add social link
             </button>
           </div>
+
+          <label>
+            Copyright
+            <input value={copyright} onChange={(e) => setCopyright(e.target.value)} />
+          </label>
+          <label>
+            Legal links (one per line: label|href)
+            <textarea
+              rows={3}
+              value={legalLinks}
+              onChange={(e) => setLegalLinks(e.target.value)}
+              placeholder={"Privacy Policy|/privacy\nTerms and conditions|/terms"}
+            />
+          </label>
 
           <h2>Feature flags</h2>
           <label style={{ display: "flex", alignItems: "center", gap: 8 }}>

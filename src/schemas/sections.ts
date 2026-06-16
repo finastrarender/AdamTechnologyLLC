@@ -685,6 +685,12 @@ export function parseSectionData(type: string, data: unknown): unknown {
 
 export const siteGlobalPayloadSchema = z.object({
   navItems: z.array(navItemSchema),
+  headerMeta: z
+    .object({
+      inquireLabel: z.string().optional(),
+      inquireHref: z.string().optional(),
+    })
+    .optional(),
   footerColumns: z.array(
     z.union([footerLinkColumnSchema, footerContactColumnSchema]),
   ),
@@ -692,6 +698,7 @@ export const siteGlobalPayloadSchema = z.object({
     brand: z.string(),
     description: z.string(),
     officeAddress: z.string().optional(),
+    officeTitle: z.string().optional(),
     social: z.array(
       z.union([
         z.string(),

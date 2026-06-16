@@ -7,6 +7,13 @@ const siteGlobalSchema = new Schema(
     footerColumns: { type: Schema.Types.Mixed, required: true },
     footerMeta: { type: Schema.Types.Mixed, required: true },
     logoSrc: { type: String },
+    headerMeta: {
+      type: {
+        inquireLabel: String,
+        inquireHref: String,
+      },
+      required: false,
+    },
     featureFlags: { type: Schema.Types.Mixed, default: {} },
     seoDefaults: {
       type: {

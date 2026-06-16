@@ -15,10 +15,14 @@ export default function SiteHeader({
   navItems,
   logoSrc,
   brandName = "Adam Technology",
+  inquireLabel = "Inquire",
+  inquireHref = "/contact",
 }: {
   navItems: NavItem[];
   logoSrc?: string;
   brandName?: string;
+  inquireLabel?: string;
+  inquireHref?: string;
 }) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -54,6 +58,11 @@ export default function SiteHeader({
       return { label, href };
     })
     .slice(0, 5);
+
+  const trimmedInquireLabel = inquireLabel?.trim() ?? "";
+  const trimmedInquireHref = inquireHref?.trim() || "/contact";
+  const showInquireButton = Boolean(trimmedInquireLabel && trimmedInquireHref);
+  const InquireLink = trimmedInquireHref.includes("#") ? HashLink : Link;
 
   return (
     <header className={`site-header${isMenuOpen ? " is-menu-open" : ""}`}>
@@ -116,14 +125,16 @@ export default function SiteHeader({
         </button>
 
         <div className="site-header__actions">
-          <Link
-            href="/contact"
-            className="header-button"
-            aria-label="Inquire"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Inquire
-          </Link>
+          {showInquireButton ? (
+            <InquireLink
+              href={trimmedInquireHref}
+              className="header-button"
+              aria-label={trimmedInquireLabel}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {trimmedInquireLabel}
+            </InquireLink>
+          ) : null}
         </div>
 
         {isMenuOpen ? (

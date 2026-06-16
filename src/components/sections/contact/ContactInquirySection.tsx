@@ -4,6 +4,10 @@ import React, { useState } from "react";
 import type { z } from "zod";
 import type { contactInquiryDataSchema } from "@/schemas/sections";
 import { buildContactMapEmbedUrl } from "@/lib/contact-map";
+import {
+  validateContactForm,
+  type ContactFormFieldErrors,
+} from "@/lib/contact-form-validation";
 import SimpleIcon from "../SimpleIcon";
 
 type ContactInquiryContent = z.infer<typeof contactInquiryDataSchema>;
@@ -39,13 +43,17 @@ function resolveContactItems(content: ContactInquiryContent) {
   return items.length > 0 ? items : DEFAULT_CONTACT_ITEMS;
 }
 
+function fieldClass(hasError: boolean) {
+  return `contact-inquiry__input${hasError ? " contact-inquiry__input--error" : ""}`;
+}
+
 export default function ContactInquirySection({ content }: { content: ContactInquiryContent }) {
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "err">("idle");
   const [message, setMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<ContactFormFieldErrors>({});
   const formFields = content.formFields ?? {};
   const inquiryOptions =
     content.inquiryOptions?.length > 0 ? content.inquiryOptions : DEFAULT_INQUIRY_OPTIONS;
-  const defaultInquiry = inquiryOptions[0] ?? "Cloud Architecture";
   const office = resolveOfficeLocation(content);
   const contactItems = resolveContactItems(content);
   const mapEmbedUrl = buildContactMapEmbedUrl(office.address, content.mapEmbedUrl);
@@ -58,9 +66,20 @@ export default function ContactInquirySection({ content }: { content: ContactInq
     content.formDescription?.trim() ||
     "Contact our strategic advisory team to deploy enterprise-grade solutions tailored for high-stakes environments.";
 
+  function clearFieldError(field: keyof ContactFormFieldErrors) {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }
+
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setStatus("loading");
+    setMessage("");
+    setFieldErrors({});
+
     const form = e.currentTarget;
     const fd = new FormData(form);
     const body = {
@@ -71,24 +90,38 @@ export default function ContactInquirySection({ content }: { content: ContactInq
       inquiryType: String(fd.get("inquiryType") ?? ""),
       message: String(fd.get("message") ?? ""),
     };
+
+    const validation = validateContactForm(body);
+    if (!validation.success) {
+      setStatus("err");
+      setFieldErrors(validation.errors);
+      setMessage(validation.message);
+      return;
+    }
+
+    setStatus("loading");
     try {
       const res = await fetch("/api/v1/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify(validation.data),
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
         setStatus("err");
-        setMessage(json?.error?.message ?? "Something went wrong");
+        const details = json?.error?.details as { fieldErrors?: ContactFormFieldErrors } | undefined;
+        if (details?.fieldErrors) setFieldErrors(details.fieldErrors);
+        setMessage(json?.error?.message ?? formFields.errorMessage ?? "Something went wrong.");
         return;
       }
       setStatus("ok");
-      setMessage(formFields.successMessage ?? "Thank you - our consultants will be in touch shortly.");
+      setMessage(
+        formFields.successMessage ?? "Thank you - our consultants will be in touch shortly.",
+      );
       form.reset();
     } catch {
       setStatus("err");
-      setMessage(formFields.errorMessage ?? "Network error");
+      setMessage(formFields.errorMessage ?? "Network error. Please try again.");
     }
   }
 
@@ -108,7 +141,11 @@ export default function ContactInquirySection({ content }: { content: ContactInq
               {content.formTitle ?? "Initialize Engagement"}
             </h2>
 
-            <form className="contact-inquiry__form contact-inquiry__form--reference" onSubmit={onSubmit}>
+            <form
+              className="contact-inquiry__form contact-inquiry__form--reference"
+              onSubmit={onSubmit}
+              noValidate
+            >
               <div className="contact-inquiry__row">
                 <label className="contact-inquiry__field">
                   <span>{formFields.fullNameLabel ?? "Full Name"}</span>
@@ -116,10 +153,14 @@ export default function ContactInquirySection({ content }: { content: ContactInq
                     suppressHydrationWarning
                     name="name"
                     type="text"
-                    required
-                    className="contact-inquiry__input"
+                    autoComplete="name"
+                    className={fieldClass(Boolean(fieldErrors.name))}
                     placeholder={formFields.fullNamePlaceholder ?? "John Doe"}
+                    onChange={() => clearFieldError("name")}
                   />
+                  {fieldErrors.name ? (
+                    <p className="contact-inquiry__field-error">{fieldErrors.name}</p>
+                  ) : null}
                 </label>
                 <label className="contact-inquiry__field">
                   <span>{formFields.companyLabel ?? "Company Name"}</span>
@@ -127,39 +168,54 @@ export default function ContactInquirySection({ content }: { content: ContactInq
                     suppressHydrationWarning
                     name="company"
                     type="text"
-                    className="contact-inquiry__input"
+                    autoComplete="organization"
+                    className={fieldClass(Boolean(fieldErrors.company))}
                     placeholder={formFields.companyPlaceholder ?? "Global Enterprise LLC"}
+                    onChange={() => clearFieldError("company")}
                   />
+                  {fieldErrors.company ? (
+                    <p className="contact-inquiry__field-error">{fieldErrors.company}</p>
+                  ) : null}
                 </label>
               </div>
 
               <div className="contact-inquiry__row">
                 <label className="contact-inquiry__field">
-                  <span>{formFields.workEmailLabel ?? "Business Email"}</span>
+                  <span>{formFields.workEmailLabel ?? "Email Address"}</span>
                   <input
                     suppressHydrationWarning
                     name="email"
                     type="email"
-                    required
-                    className="contact-inquiry__input"
+                    autoComplete="email"
+                    className={fieldClass(Boolean(fieldErrors.email))}
                     placeholder={formFields.workEmailPlaceholder ?? "j.doe@enterprise.com"}
+                    onChange={() => clearFieldError("email")}
                   />
+                  {fieldErrors.email ? (
+                    <p className="contact-inquiry__field-error">{fieldErrors.email}</p>
+                  ) : null}
                 </label>
                 <label className="contact-inquiry__field">
                   <span>{formFields.interestLabel ?? "Interest Area"}</span>
                   <select
                     suppressHydrationWarning
                     name="inquiryType"
-                    required
-                    defaultValue={defaultInquiry}
-                    className="contact-inquiry__input contact-inquiry__select"
+                    defaultValue=""
+                    className={`${fieldClass(Boolean(fieldErrors.inquiryType))} contact-inquiry__select`}
+                    onChange={() => clearFieldError("inquiryType")}
                   >
+                    <option value="" disabled>
+                      Please select an interest area
+                    </option>
                     {inquiryOptions.map((option) => (
                       <option key={option} value={option}>
                         {option}
                       </option>
                     ))}
                   </select>
+                  {fieldErrors.inquiryType ? (
+                    <p className="contact-inquiry__field-error">{fieldErrors.inquiryType}</p>
+                  ) : null}
                 </label>
               </div>
 
@@ -168,21 +224,40 @@ export default function ContactInquirySection({ content }: { content: ContactInq
                 <textarea
                   suppressHydrationWarning
                   name="message"
-                  required
                   rows={5}
-                  className="contact-inquiry__input contact-inquiry__textarea"
+                  className={`${fieldClass(Boolean(fieldErrors.message))} contact-inquiry__textarea`}
                   placeholder={formFields.messagePlaceholder ?? "Describe your technical requirements..."}
+                  onChange={() => clearFieldError("message")}
                 />
+                {fieldErrors.message ? (
+                  <p className="contact-inquiry__field-error">{fieldErrors.message}</p>
+                ) : null}
               </label>
 
               <input suppressHydrationWarning name="phone" type="hidden" value="" readOnly />
-              <button suppressHydrationWarning type="submit" className="contact-inquiry__submit" disabled={status === "loading"}>
+              <button
+                suppressHydrationWarning
+                type="submit"
+                className="contact-inquiry__submit"
+                disabled={status === "loading"}
+              >
                 <span>{status === "loading" ? "Submitting..." : content.submitLabel ?? "Submit Inquiry"}</span>
               </button>
               <p className="contact-inquiry__status-note">
                 {formFields.disclaimerText ?? "Your data is protected under UAE Federal Decree-Law No. 45 of 2021."}
               </p>
-              {message ? <p className={status === "ok" ? "contact-form__ok" : "contact-form__err"}>{message}</p> : null}
+              {message ? (
+                <p
+                  className={`contact-inquiry__form-message ${
+                    status === "ok"
+                      ? "contact-inquiry__form-message--success"
+                      : "contact-inquiry__form-message--error"
+                  }`}
+                  role={status === "ok" ? "status" : "alert"}
+                >
+                  {message}
+                </p>
+              ) : null}
             </form>
           </div>
 

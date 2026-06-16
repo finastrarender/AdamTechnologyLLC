@@ -22,6 +22,7 @@ export default async function AdminDashboardPage() {
         <div className="admin-dashboard__nav-links">
           <Link href="/">View site</Link>
           <Link href="/admin/site-global">Site global</Link>
+          <Link href="/admin/contact-inquiries">Contact inquiries</Link>
           <LogoutButton />
         </div>
       </nav>
@@ -63,6 +64,18 @@ export default async function AdminDashboardPage() {
               <p className="admin-muted">No pages found.</p>
             ) : null}
           </div>
+        </section>
+
+        <section className="admin-dashboard__section">
+          <div className="admin-dashboard__section-head">
+            <h2>Contact inquiries</h2>
+            <p className="admin-muted">Review and delete submissions from the contact page form.</p>
+          </div>
+          <Link href="/admin/contact-inquiries" className="admin-dashboard__page-card">
+            <span className="admin-dashboard__page-title">Contact inquiries</span>
+            <span className="admin-dashboard__page-meta">View submissions</span>
+            <span className="admin-dashboard__page-link">Open inbox</span>
+          </Link>
         </section>
       </div>
     </div>

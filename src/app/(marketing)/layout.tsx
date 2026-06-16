@@ -2,6 +2,7 @@ import {
   defaultApplyNowModal,
   defaultFooterColumns,
   defaultFooterMeta,
+  defaultHeaderMeta,
   defaultLogoSrc,
   defaultNavItems,
 } from "@/data/site-defaults";
@@ -29,6 +30,8 @@ export default async function MarketingLayout({
   const footerMeta =
     (global?.footerMeta as typeof defaultFooterMeta) ?? defaultFooterMeta;
   const logoSrc = (global?.logoSrc as string | undefined) ?? defaultLogoSrc;
+  const headerMeta =
+    (global?.headerMeta as typeof defaultHeaderMeta | undefined) ?? defaultHeaderMeta;
   const featureFlags = (global?.featureFlags as Record<string, boolean> | undefined) ?? {};
   const footerLogoLightFilter = featureFlags.footerLogoLightFilter !== false;
   const applyNowModal = {
@@ -41,6 +44,8 @@ export default async function MarketingLayout({
         navItems={navItems}
         logoSrc={logoSrc}
         brandName={footerMeta.brand || "Adam Technology"}
+        inquireLabel={headerMeta.inquireLabel}
+        inquireHref={headerMeta.inquireHref}
       />
       <main>{children}</main>
       <ScrollToHash />

@@ -9,6 +9,11 @@ export const defaultNavItems = [
   { label: "Contact", href: "/contact" },
 ];
 
+export const defaultHeaderMeta = {
+  inquireLabel: "Inquire",
+  inquireHref: "/contact",
+};
+
 export type FooterLink = { label: string; href: string };
 export type FooterMetaLink = { label: string; href: string; icon?: string };
 export type FooterLinkColumn = { title: string; links: FooterLink[] };
@@ -43,6 +48,7 @@ export const defaultFooterMeta = {
     "Pioneering secure digital horizons from the heart of Dubai, fully licensed and enterprise-ready.",
   officeAddress:
     "Adam Technology LLC, ART XV Residency, Office 103, Marasi Dr, Business Bay, Dubai, UAE",
+  officeTitle: "Office",
   social: [
     {
       icon: "globe",

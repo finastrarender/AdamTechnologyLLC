@@ -43,6 +43,7 @@ export async function PATCH(request: Request) {
         footerColumns: parsed.data.footerColumns,
         footerMeta: parsed.data.footerMeta,
         logoSrc: parsed.data.logoSrc,
+        headerMeta: parsed.data.headerMeta,
         featureFlags: parsed.data.featureFlags ?? {},
         seoDefaults: parsed.data.seoDefaults,
         applyNowModal: parsed.data.applyNowModal,
