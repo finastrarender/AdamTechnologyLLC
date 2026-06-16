@@ -1,4 +1,9 @@
 import LoginForm from "@/components/admin/LoginForm";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Sign in",
+};
 
 export default function AdminLoginPage() {
   return (

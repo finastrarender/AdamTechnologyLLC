@@ -25,13 +25,34 @@ function stripTrailingBrand(title: string, brandName: string): string {
   return result;
 }
 
+export function coerceSeoTitleString(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    if (typeof record.absolute === "string") return record.absolute;
+    if (typeof record.default === "string") return record.default;
+  }
+  return "";
+}
+
+export function stripTrailingBrandFromSeoTitle(
+  title: unknown,
+  brandName = "Adam Technology L.L.C.",
+): string {
+  return stripTrailingBrand(coerceSeoTitleString(title), brandName);
+}
+
 export function resolveMetadataTitle(
   seoTitle: string | undefined,
   pageTitle: string,
   siteDefaultTitle = "Adam Technology L.L.C.",
 ): Metadata["title"] {
   const brandName = siteDefaultTitle.trim() || "Adam Technology L.L.C.";
-  const raw = (seoTitle?.trim() || pageTitle.trim() || brandName).trim();
+  const raw = (
+    coerceSeoTitleString(seoTitle).trim() ||
+    pageTitle.trim() ||
+    brandName
+  ).trim();
   const pagePart = stripTrailingBrand(raw, brandName);
 
   const isBrandOnlyTitle =
@@ -45,4 +66,21 @@ export function resolveMetadataTitle(
 
   // Root layout template adds " | Adam Technology L.L.C." once.
   return pagePart;
+}
+
+/** Full browser tab title as shown on the public site (page + brand). */
+export function formatFullSeoTitle(
+  seoTitle: string | undefined,
+  pageTitle: string,
+  siteDefaultTitle = "Adam Technology L.L.C.",
+): string {
+  const brandName = siteDefaultTitle.trim() || "Adam Technology L.L.C.";
+  const resolved = resolveMetadataTitle(seoTitle, pageTitle, brandName);
+
+  if (resolved && typeof resolved === "object" && "absolute" in resolved) {
+    return String(resolved.absolute);
+  }
+
+  const pagePart = String(resolved).trim();
+  return `${pagePart} | ${brandName}`;
 }

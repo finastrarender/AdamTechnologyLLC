@@ -13,6 +13,7 @@ import {
   resolveHeaderMeta,
   type FooterLinkColumn,
 } from "@/data/site-defaults";
+import { coerceSeoTitleString, stripTrailingBrandFromSeoTitle } from "@/lib/metadata/title";
 
 type NavItem = { label: string; href: string };
 type PageSummary = { slug: string; title: string };
@@ -149,7 +150,11 @@ export default function SiteGlobalEditClient() {
         setLegalLinks(formatMetaLinks((d.footerMeta?.legal ?? []) as Array<string | FooterMetaLink>, "/contact"));
         setClientLogosFlag(d.featureFlags?.clientLogos !== false);
         setFooterLogoLightFilter(d.featureFlags?.footerLogoLightFilter !== false);
-        setSeoDefaultTitle(d.seoDefaults?.defaultTitle ?? "Adam Technology L.L.C.");
+        setSeoDefaultTitle(
+          stripTrailingBrandFromSeoTitle(
+            coerceSeoTitleString(d.seoDefaults?.defaultTitle ?? "Adam Technology L.L.C."),
+          ),
+        );
         setSeoDefaultDescription(
           d.seoDefaults?.defaultDescription ??
             "Adam Technology L.L.C. delivers enterprise-grade cybersecurity, cloud & data infrastructure, and custom software engineering from Dubai, UAE.",
@@ -280,7 +285,7 @@ export default function SiteGlobalEditClient() {
         legal: parseLegalMetaLinks(legalLinks),
       },
       seoDefaults: {
-        defaultTitle: seoDefaultTitle || undefined,
+        defaultTitle: stripTrailingBrandFromSeoTitle(seoDefaultTitle) || undefined,
         defaultDescription: seoDefaultDescription || undefined,
       },
       featureFlags: {
@@ -622,6 +627,10 @@ export default function SiteGlobalEditClient() {
               onChange={(e) => setSeoDefaultTitle(e.target.value)}
               placeholder="Adam Technology L.L.C."
             />
+            <span className="admin-muted" style={{ display: "block", marginTop: "0.35rem" }}>
+              Use the site/brand name only for the home page default. Other pages append this brand
+              via the layout template once.
+            </span>
           </label>
           <label>
             Default SEO description

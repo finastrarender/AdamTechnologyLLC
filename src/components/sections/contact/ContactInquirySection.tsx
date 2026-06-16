@@ -8,6 +8,10 @@ import {
   validateContactForm,
   type ContactFormFieldErrors,
 } from "@/lib/contact-form-validation";
+import {
+  isExternalContactHref,
+  resolveContactItemHref,
+} from "@/lib/contact-item-link";
 import SimpleIcon from "../SimpleIcon";
 
 type ContactInquiryContent = z.infer<typeof contactInquiryDataSchema>;
@@ -22,9 +26,24 @@ const DEFAULT_INQUIRY_OPTIONS = [
 ];
 
 const DEFAULT_CONTACT_ITEMS = [
-  { title: "Phone", lines: ["+971 4 338 7946"], icon: "phone" },
-  { title: "Email", lines: ["info@adamtechnology.ae"], icon: "mail" },
-  { title: "Website", lines: ["www.adamtechnology.ae"], icon: "globe" },
+  {
+    title: "Phone",
+    lines: ["+971 4 338 7946"],
+    icon: "phone",
+    href: "tel:+97143387946",
+  },
+  {
+    title: "Email",
+    lines: ["info@adamtechnology.ae"],
+    icon: "mail",
+    href: "mailto:info@adamtechnology.ae",
+  },
+  {
+    title: "Website",
+    lines: ["www.adamtechnology.ae"],
+    icon: "globe",
+    href: "https://www.adamtechnology.ae",
+  },
 ];
 
 function resolveOfficeLocation(content: ContactInquiryContent) {
@@ -286,12 +305,37 @@ export default function ContactInquirySection({ content }: { content: ContactInq
             </div>
 
             <div className="contact-inquiry__contact-card">
-              {contactItems.map((item) => (
-                <p key={`${item.icon}-${item.lines[0]}`}>
-                  <SimpleIcon name={item.icon} className="contact-inquiry__contact-icon" />
-                  <span>{item.lines[0]}</span>
-                </p>
-              ))}
+              {contactItems.map((item) => {
+                const href = resolveContactItemHref(item);
+                const label = item.lines[0] ?? "";
+                const content = (
+                  <>
+                    <SimpleIcon name={item.icon} className="contact-inquiry__contact-icon" />
+                    <span>{label}</span>
+                  </>
+                );
+
+                if (!href) {
+                  return (
+                    <p key={`${item.icon}-${label}`} className="contact-inquiry__contact-entry">
+                      {content}
+                    </p>
+                  );
+                }
+
+                return (
+                  <a
+                    key={`${item.icon}-${label}`}
+                    href={href}
+                    className="contact-inquiry__contact-link"
+                    {...(isExternalContactHref(href)
+                      ? { target: "_blank", rel: "noopener noreferrer" }
+                      : {})}
+                  >
+                    {content}
+                  </a>
+                );
+              })}
             </div>
           </aside>
         </div>

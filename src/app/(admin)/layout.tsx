@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
-    default: "Admin | Adam Technology L.L.C.",
-    template: "%s | Admin | Adam Technology L.L.C.",
+    default: "Admin",
+    template: "%s | Admin",
   },
 };
 

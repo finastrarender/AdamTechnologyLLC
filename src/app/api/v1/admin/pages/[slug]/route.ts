@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { jsonData, jsonError } from "@/lib/api-response";
+import { coerceSeoTitleString } from "@/lib/metadata/title";
 import { revalidatePage, revalidateSiteGlobal } from "@/lib/revalidate-content";
 import { slugToHref, normalizePageSlug } from "@/lib/slugs";
 import { connectMongo } from "@/lib/mongoose";
@@ -49,6 +50,11 @@ const patchBodySchema = z.object({
 });
 
 type RouteContext = { params: Promise<{ slug: string }> };
+
+function normalizePagePayload<T extends { seoTitle?: unknown }>(page: T) {
+  const seoTitle = coerceSeoTitleString(page.seoTitle);
+  return { ...page, seoTitle: seoTitle || undefined };
+}
 
 function ensureHomeHasSections(sections: PageSection[]): PageSection[] {
   const defaults = buildHomeSections();
@@ -114,11 +120,11 @@ export async function GET(_request: Request, context: RouteContext) {
         existingDoc.set("publishedSections", JSON.parse(JSON.stringify(nextPublished)));
       if (sectionsChanged || publishedChanged) await existingDoc.save();
 
-      return jsonData(existingDoc.toObject());
+      return jsonData(normalizePagePayload(existingDoc.toObject()));
     }
   } else {
     const existing = await Page.findOne({ slug }).lean();
-    if (existing) return jsonData(existing);
+    if (existing) return jsonData(normalizePagePayload(existing));
   }
 
   if (slug !== "home") {
@@ -136,7 +142,7 @@ export async function GET(_request: Request, context: RouteContext) {
       "Adam Technology L.L.C. delivers enterprise-grade cybersecurity, cloud & data infrastructure, and custom software engineering from Dubai, UAE.",
   });
 
-  return jsonData(created.toObject());
+  return jsonData(normalizePagePayload(created.toObject()));
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
@@ -247,5 +253,5 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (page.slug !== slug) {
     revalidatePage(page.slug, page.sections as PageSection[]);
   }
-  return jsonData(page);
+  return jsonData(normalizePagePayload(page));
 }

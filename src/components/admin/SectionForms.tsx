@@ -2945,6 +2945,7 @@ type ContactOfficeItemFormValue = {
   title: string;
   linesText: string;
   icon: string;
+  href: string;
 };
 
 type ContactDepartmentFormValue = {
@@ -3765,11 +3766,9 @@ export function IndustriesCtaSectionForm({
 }
 
 type ContactInquiryFormValues = {
-  heroEyebrow: string;
   heroTitleLinesText: string;
   heroSideCopy: string;
   formTitle: string;
-  formDescription: string;
   submitLabel: string;
   inquiryOptionsText: string;
   officeHeading: string;
@@ -3781,7 +3780,6 @@ type ContactInquiryFormValues = {
   workEmailLabel: string;
   workEmailPlaceholder: string;
   interestLabel: string;
-  interestPlaceholder: string;
   messageLabel: string;
   messagePlaceholder: string;
   disclaimerText: string;
@@ -3807,12 +3805,10 @@ function toContactInquiryDefaultValues(
     : defaults.heroTitleLines;
 
   return {
-    heroEyebrow: (data.heroEyebrow as string) ?? "",
     heroTitleLinesText:
       heroTitleLines.length > 0 ? heroTitleLines.join("\n") : defaults.heroTitleLines.join("\n"),
     heroSideCopy: (data.heroSideCopy as string) ?? defaults.heroSideCopy,
     formTitle: (data.formTitle as string) ?? defaults.formTitle,
-    formDescription: (data.formDescription as string) ?? defaults.formDescription,
     submitLabel: (data.submitLabel as string) ?? defaults.submitLabel,
     inquiryOptionsText: Array.isArray(data.inquiryOptions)
       ? (data.inquiryOptions as string[]).join("\n")
@@ -3826,11 +3822,13 @@ function toContactInquiryDefaultValues(
               ? (item.lines as string[]).join("\n")
               : "",
             icon: (item.icon as string) ?? "",
+            href: (item.href as string) ?? "",
           }))
         : defaults.officeItems.map((item) => ({
             title: item.title,
             linesText: item.lines.join("\n"),
             icon: item.icon,
+            href: "href" in item && typeof item.href === "string" ? item.href : "",
           })),
     fullNameLabel: (formFields.fullNameLabel as string) ?? defaults.formFields.fullNameLabel,
     fullNamePlaceholder:
@@ -3842,7 +3840,6 @@ function toContactInquiryDefaultValues(
     workEmailPlaceholder:
       (formFields.workEmailPlaceholder as string) ?? defaults.formFields.workEmailPlaceholder,
     interestLabel: (formFields.interestLabel as string) ?? defaults.formFields.interestLabel,
-    interestPlaceholder: (formFields.interestPlaceholder as string) ?? "",
     messageLabel: (formFields.messageLabel as string) ?? defaults.formFields.messageLabel,
     messagePlaceholder:
       (formFields.messagePlaceholder as string) ?? defaults.formFields.messagePlaceholder,
@@ -3879,14 +3876,14 @@ export function ContactInquirySectionForm({
 
   function handleValid(values: ContactInquiryFormValues) {
     onSave({
-      heroEyebrow: values.heroEyebrow.trim(),
       heroTitleLines: values.heroTitleLinesText
         .split("\n")
         .map((line) => line.trim())
         .filter(Boolean),
       heroSideCopy: values.heroSideCopy.trim(),
       formTitle: values.formTitle,
-      formDescription: values.formDescription,
+      formDescription:
+        typeof section.data.formDescription === "string" ? section.data.formDescription : "",
       submitLabel: values.submitLabel,
       inquiryOptions: values.inquiryOptionsText
         .split("\n")
@@ -3900,6 +3897,7 @@ export function ContactInquirySectionForm({
           .map((line) => line.trim())
           .filter(Boolean),
         icon: item.icon,
+        href: item.href.trim() || undefined,
       })),
       formFields: {
         fullNameLabel: values.fullNameLabel.trim(),
@@ -3909,7 +3907,6 @@ export function ContactInquirySectionForm({
         workEmailLabel: values.workEmailLabel.trim(),
         workEmailPlaceholder: values.workEmailPlaceholder.trim(),
         interestLabel: values.interestLabel.trim(),
-        interestPlaceholder: values.interestPlaceholder.trim(),
         messageLabel: values.messageLabel.trim(),
         messagePlaceholder: values.messagePlaceholder.trim(),
         disclaimerText: values.disclaimerText.trim(),
@@ -3933,16 +3930,6 @@ export function ContactInquirySectionForm({
       }}
     >
       <SectionHeading section={section} />
-
-      <label>
-        Hero eyebrow
-        <input
-          {...register("heroEyebrow", { required: "Hero eyebrow is required" })}
-        />
-        {errors.heroEyebrow ? (
-          <p className="admin-field-error">{errors.heroEyebrow.message}</p>
-        ) : null}
-      </label>
 
       <label>
         Hero title lines (one per line)
@@ -3977,19 +3964,6 @@ export function ContactInquirySectionForm({
         />
         {errors.formTitle ? (
           <p className="admin-field-error">{errors.formTitle.message}</p>
-        ) : null}
-      </label>
-
-      <label>
-        Form description
-        <textarea
-          rows={3}
-          {...register("formDescription", {
-            required: "Description is required",
-          })}
-        />
-        {errors.formDescription ? (
-          <p className="admin-field-error">{errors.formDescription.message}</p>
         ) : null}
       </label>
 
@@ -4057,6 +4031,17 @@ export function ContactInquirySectionForm({
               />
             </label>
             <label>
+              Link (optional)
+              <input
+                {...register(`officeItems.${index}.href`)}
+                placeholder="tel:+971..., mailto:..., or https://..."
+              />
+              <FieldHint>
+                Used for phone, email, and website rows in the contact card. Leave blank to
+                auto-generate from the first line and icon.
+              </FieldHint>
+            </label>
+            <label>
               choose an Icon
               <Controller
                 control={control}
@@ -4081,7 +4066,7 @@ export function ContactInquirySectionForm({
         <button
           type="button"
           className="admin-button-secondary"
-          onClick={() => append({ title: "", linesText: "", icon: "location" })}
+          onClick={() => append({ title: "", linesText: "", icon: "location", href: "" })}
         >
           Add office item
         </button>
@@ -4127,7 +4112,6 @@ export function ContactInquirySectionForm({
         <label>Work email label<input {...register("workEmailLabel", { required: true })} /></label>
         <label>Work email placeholder<input {...register("workEmailPlaceholder", { required: true })} /></label>
         <label>Interest area label<input {...register("interestLabel", { required: true })} /></label>
-        <label>Interest area placeholder<input {...register("interestPlaceholder", { required: true })} /></label>
         <label>Message label<input {...register("messageLabel", { required: true })} /></label>
         <label>Message placeholder<input {...register("messagePlaceholder", { required: true })} /></label>
         <label>Disclaimer text<textarea rows={3} {...register("disclaimerText", { required: true })} /></label>

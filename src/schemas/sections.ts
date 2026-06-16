@@ -363,6 +363,7 @@ const contactInfoItemSchema = z.object({
   title: z.string(),
   lines: z.array(z.string()),
   icon: z.string(),
+  href: z.string().optional(),
 });
 
 const contactDepartmentSchema = z.object({
@@ -395,7 +396,7 @@ export const contactInquiryDataSchema = z.object({
   heroTitleLines: z.array(z.string()).optional(),
   heroSideCopy: z.string().optional(),
   formTitle: z.string(),
-  formDescription: z.string(),
+  formDescription: z.string().optional(),
   submitLabel: z.string(),
   inquiryOptions: z.array(z.string()),
   officeHeading: z.string(),

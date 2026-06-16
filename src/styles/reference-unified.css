@@ -1578,7 +1578,9 @@ p {
   overflow: hidden;
 }
 
-.contact-inquiry__contact-card p {
+.contact-inquiry__contact-card p,
+.contact-inquiry__contact-entry,
+.contact-inquiry__contact-link {
   display: flex;
   align-items: flex-start;
   gap: 14px;
@@ -1590,7 +1592,20 @@ p {
   line-height: 1.4;
 }
 
-.contact-inquiry__contact-card p span {
+.contact-inquiry__contact-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.contact-inquiry__contact-link:hover,
+.contact-inquiry__contact-link:focus-visible {
+  color: #93b4e8;
+}
+
+.contact-inquiry__contact-card p span,
+.contact-inquiry__contact-entry span,
+.contact-inquiry__contact-link span {
   min-width: 0;
   word-break: break-word;
 }

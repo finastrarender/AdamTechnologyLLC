@@ -46,6 +46,11 @@ import {
 } from "@/components/admin/SectionForms";
 import { type SectionType } from "@/types/section";
 import { getDefaultSectionData } from "@/data/page-section-defaults";
+import {
+  coerceSeoTitleString,
+  formatFullSeoTitle,
+  stripTrailingBrandFromSeoTitle,
+} from "@/lib/metadata/title";
 
 type SectionRow = { id: string; type: string; order: number; data: Record<string, unknown> };
 type SectionSaveState = {
@@ -126,7 +131,9 @@ export default function PageEditClient({ slug }: { slug: string }) {
     const res = await fetch(`/api/v1/admin/pages/${slugPathSegment(slug)}`);
     const json = await parseJsonResponse(res);
     if (!res.ok) throw new Error(json?.error?.message ?? "Load failed");
-    setPage(json.data);
+    const data = json.data as NonNullable<typeof page>;
+    const seoTitle = coerceSeoTitleString(data?.seoTitle);
+    setPage({ ...data, seoTitle: seoTitle || undefined });
   }, [slug]);
 
   useEffect(() => {
@@ -165,7 +172,8 @@ export default function PageEditClient({ slug }: { slug: string }) {
       body: JSON.stringify({
         slug: nextSlug,
         title: fd.get("title"),
-        seoTitle: fd.get("seoTitle") || undefined,
+        seoTitle:
+          stripTrailingBrandFromSeoTitle(coerceSeoTitleString(fd.get("seoTitle"))) || undefined,
         seoDescription: fd.get("seoDescription") || undefined,
         ogImage: fd.get("ogImage") || undefined,
         canonicalPath: fd.get("canonicalPath") || undefined,
@@ -176,7 +184,13 @@ export default function PageEditClient({ slug }: { slug: string }) {
       setMessage(json?.error?.message ?? "Save failed");
       return;
     }
-    setPage(json.data);
+    const saved = json.data as typeof page;
+    if (saved) {
+      const seoTitle = coerceSeoTitleString(saved.seoTitle);
+      setPage({ ...saved, seoTitle: seoTitle || undefined });
+    } else {
+      setPage(saved);
+    }
     setMessage("Meta saved.");
     if (json.data.slug && json.data.slug !== slug) {
       router.replace(`/admin/pages/${json.data.slug}`);
@@ -361,10 +375,20 @@ export default function PageEditClient({ slug }: { slug: string }) {
             SEO title
             <input
               name="seoTitle"
-              key={page.seoTitle}
-              defaultValue={page.seoTitle ?? ""}
+              key={`${page.slug}-seo-title`}
+              defaultValue={stripTrailingBrandFromSeoTitle(page.seoTitle)}
               placeholder="About Us"
             />
+            <span className="admin-muted" style={{ display: "block", marginTop: "0.35rem" }}>
+              Live tab title:{" "}
+              <strong>
+                {formatFullSeoTitle(
+                  stripTrailingBrandFromSeoTitle(page.seoTitle) || undefined,
+                  page.title,
+                )}
+              </strong>
+              . Enter the page part only — brand is appended automatically.
+            </span>
           </label>
           <label>
             SEO description

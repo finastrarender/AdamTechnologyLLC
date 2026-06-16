@@ -2,8 +2,13 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { connectMongo } from "@/lib/mongoose";
 import Page from "@/models/Page";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import LogoutButton from "@/components/admin/LogoutButton";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+};
 
 export default async function AdminDashboardPage() {
   const session = await auth();
