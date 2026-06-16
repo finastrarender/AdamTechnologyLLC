@@ -130,9 +130,9 @@ export const ABOUT_VISION_MISSION_SECTION_DEFAULT = {
   overview: {
     title: "COMPANY OVERVIEW",
     description:
-      "Adam Technology LLC is a premier IT and cybersecurity solutions provider headquartered in Dubai, UAE. Licensed by the Department of Economy and Tourism, the company specializes in protecting digital assets and modernizing the technology infrastructure of modern enterprises.",
+      "Adam Technology LLC is a premier IT and cybersecurity solutions provider headquartered in Dubai, UAE. Licensed by the Department of Economy and Tourism, the company specializes in protecting digital assets and modernizing the technology infrastructure of modern enterprises. The firm bridges the gap between complex emerging technologies such as Blockchain and the Metaverse and practical, secure enterprise operations.",
     subDescription:
-      "The firm bridges the gap between complex emerging technologies—such as Blockchain and the Metaverse—and practical, secure enterprise operations.",
+      "With a commitment to sovereign digital infrastructure, we deliver end to end solutions that meet the highest regulatory standards while enabling enterprises to innovate at the speed of global markets.",
     image: "/about/company-buildings.jpg",
   },
   items: [
@@ -302,15 +302,23 @@ export function joinOverviewDescription(description?: string, subDescription?: s
 }
 
 export function splitOverviewDescription(text: string) {
-  const splitMarker = "The firm bridges";
-  const idx = text.indexOf(splitMarker);
-  if (idx === -1) {
-    return { description: text.trim(), subDescription: undefined as string | undefined };
+  const withCommitmentIdx = text.indexOf("With a commitment");
+  if (withCommitmentIdx > 0) {
+    return {
+      description: text.slice(0, withCommitmentIdx).trim(),
+      subDescription: text.slice(withCommitmentIdx).trim(),
+    };
   }
-  return {
-    description: text.slice(0, idx).trim(),
-    subDescription: text.slice(idx).trim(),
-  };
+
+  const firmBridgesIdx = text.indexOf("The firm bridges");
+  if (firmBridgesIdx > 0) {
+    return {
+      description: text.slice(0, firmBridgesIdx).trim(),
+      subDescription: text.slice(firmBridgesIdx).trim(),
+    };
+  }
+
+  return { description: text.trim(), subDescription: undefined as string | undefined };
 }
 
 const SECTION_DEFAULTS: Partial<Record<SectionType, Record<string, unknown>>> = {

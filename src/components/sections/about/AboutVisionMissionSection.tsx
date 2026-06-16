@@ -6,9 +6,9 @@ type AboutVisionMissionContent = z.infer<typeof aboutVisionMissionDataSchema>;
 const DEFAULT_OVERVIEW = {
   title: "COMPANY OVERVIEW",
   description:
-    "Adam Technology LLC is a premier IT and cybersecurity solutions provider headquartered in Dubai, UAE. Licensed by the Department of Economy and Tourism, the company specializes in protecting digital assets and modernizing the technology infrastructure of modern enterprises.",
+    "Adam Technology LLC is a premier IT and cybersecurity solutions provider headquartered in Dubai, UAE. Licensed by the Department of Economy and Tourism, the company specializes in protecting digital assets and modernizing the technology infrastructure of modern enterprises. The firm bridges the gap between complex emerging technologies such as Blockchain and the Metaverse and practical, secure enterprise operations.",
   subDescription:
-    "The firm bridges the gap between complex emerging technologies—such as Blockchain and the Metaverse—and practical, secure enterprise operations.",
+    "With a commitment to sovereign digital infrastructure, we deliver end to end solutions that meet the highest regulatory standards while enabling enterprises to innovate at the speed of global markets.",
   image: "/about/company-buildings.jpg",
 };
 
@@ -25,6 +25,14 @@ function resolveOverviewCopy(overview: {
   }
 
   const description = overview.description ?? DEFAULT_OVERVIEW.description;
+  const withCommitmentIdx = description.indexOf("With a commitment");
+  if (withCommitmentIdx > 0) {
+    return {
+      description: description.slice(0, withCommitmentIdx).trim(),
+      subDescription: description.slice(withCommitmentIdx).trim(),
+    };
+  }
+
   const splitMarker = "The firm bridges";
   const splitIndex = description.indexOf(splitMarker);
   if (splitIndex === -1) {
