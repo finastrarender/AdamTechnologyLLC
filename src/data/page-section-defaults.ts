@@ -25,6 +25,8 @@ export const HERO_SECTION_DEFAULT = {
   primaryAction: { label: "Schedule Consultation", href: "/contact" },
   secondaryAction: { label: "Explore Services", href: "/services" },
   visualImage: "/home/hero-visual.png",
+  visualImageAlt:
+    "Robotic hand holding a digital globe representing enterprise technology and cybersecurity solutions",
 };
 
 export const INTRO_SECTION_DEFAULT = {

@@ -3,6 +3,7 @@ import { jsonData, jsonError } from "@/lib/api-response";
 import { revalidateSiteGlobal } from "@/lib/revalidate-content";
 import { connectMongo } from "@/lib/mongoose";
 import { getSiteGlobalRaw } from "@/lib/content/site-global";
+import { defaultHeaderMeta } from "@/data/site-defaults";
 import SiteGlobal from "@/models/SiteGlobal";
 import { siteGlobalPayloadSchema } from "@/schemas/sections";
 
@@ -35,21 +36,33 @@ export async function PATCH(request: Request) {
     return jsonError("validation_error", "Invalid payload", 422, parsed.error.flatten());
   }
   await connectMongo();
+  const existing = await SiteGlobal.findOne({ key: "default" }).lean();
+  const headerMeta = {
+    ...defaultHeaderMeta,
+    ...((existing?.headerMeta as Partial<typeof defaultHeaderMeta> | null) ?? {}),
+    ...(parsed.data.headerMeta ?? {}),
+  };
+
+  const update: Record<string, unknown> = {
+    navItems: parsed.data.navItems,
+    footerColumns: parsed.data.footerColumns,
+    footerMeta: parsed.data.footerMeta,
+    logoSrc: parsed.data.logoSrc,
+    headerMeta,
+    featureFlags: parsed.data.featureFlags ?? {},
+  };
+
+  if (parsed.data.seoDefaults !== undefined) {
+    update.seoDefaults = parsed.data.seoDefaults;
+  }
+  if (parsed.data.applyNowModal !== undefined) {
+    update.applyNowModal = parsed.data.applyNowModal;
+  }
+
   const doc = await SiteGlobal.findOneAndUpdate(
     { key: "default" },
-    {
-      $set: {
-        navItems: parsed.data.navItems,
-        footerColumns: parsed.data.footerColumns,
-        footerMeta: parsed.data.footerMeta,
-        logoSrc: parsed.data.logoSrc,
-        headerMeta: parsed.data.headerMeta,
-        featureFlags: parsed.data.featureFlags ?? {},
-        seoDefaults: parsed.data.seoDefaults,
-        applyNowModal: parsed.data.applyNowModal,
-      },
-    },
-    { new: true, upsert: true },
+    { $set: update },
+    { new: true, upsert: true, strict: false },
   ).lean();
   revalidateSiteGlobal();
   return jsonData(doc);

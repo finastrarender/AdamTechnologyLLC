@@ -31,6 +31,8 @@ export default function HeroSection({
     content.secondaryAction?.href?.trim() || HERO_SECTION_DEFAULT.secondaryAction.href;
   const visualImage =
     content.visualImage?.trim() || HERO_SECTION_DEFAULT.visualImage;
+  const visualImageAlt =
+    content.visualImageAlt?.trim() || HERO_SECTION_DEFAULT.visualImageAlt;
 
   return (
     <section className="hero-section" id={anchorId ?? undefined}>
@@ -75,12 +77,12 @@ export default function HeroSection({
           </div>
         </div>
 
-        <div className="hero-section__visual" aria-hidden="true">
+        <div className="hero-section__visual">
           <div className="hero-section__visual-frame">
             <img
               className="hero-section__visual-image"
               src={visualImage}
-              alt=""
+              alt={visualImageAlt}
               width={851}
               height={500}
               decoding="async"

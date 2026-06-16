@@ -5,6 +5,7 @@ import {
   defaultHeaderMeta,
   defaultLogoSrc,
   defaultNavItems,
+  resolveHeaderMeta,
 } from "@/data/site-defaults";
 import { getSiteGlobalCached } from "@/lib/content/site-global";
 import SiteFooter from "@/components/layout/SiteFooter";
@@ -30,8 +31,9 @@ export default async function MarketingLayout({
   const footerMeta =
     (global?.footerMeta as typeof defaultFooterMeta) ?? defaultFooterMeta;
   const logoSrc = (global?.logoSrc as string | undefined) ?? defaultLogoSrc;
-  const headerMeta =
-    (global?.headerMeta as typeof defaultHeaderMeta | undefined) ?? defaultHeaderMeta;
+  const headerMeta = resolveHeaderMeta(
+    global?.headerMeta as Partial<typeof defaultHeaderMeta> | undefined,
+  );
   const featureFlags = (global?.featureFlags as Record<string, boolean> | undefined) ?? {};
   const footerLogoLightFilter = featureFlags.footerLogoLightFilter !== false;
   const applyNowModal = {
@@ -39,7 +41,7 @@ export default async function MarketingLayout({
     ...((global?.applyNowModal as Partial<typeof defaultApplyNowModal> | undefined) ?? {}),
   };
   return (
-    <div className="owtc-app">
+    <>
       <SiteHeader
         navItems={navItems}
         logoSrc={logoSrc}
@@ -56,6 +58,6 @@ export default async function MarketingLayout({
         logoSrc={logoSrc}
         footerLogoLightFilter={footerLogoLightFilter}
       />
-    </div>
+    </>
   );
 }

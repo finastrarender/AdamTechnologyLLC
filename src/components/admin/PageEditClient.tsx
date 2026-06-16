@@ -363,7 +363,7 @@ export default function PageEditClient({ slug }: { slug: string }) {
               name="seoTitle"
               key={page.seoTitle}
               defaultValue={page.seoTitle ?? ""}
-              placeholder="About Us | Adam Technology L.L.C."
+              placeholder="About Us"
             />
           </label>
           <label>

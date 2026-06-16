@@ -64,6 +64,21 @@ export default function SiteHeader({
   const showInquireButton = Boolean(trimmedInquireLabel && trimmedInquireHref);
   const InquireLink = trimmedInquireHref.includes("#") ? HashLink : Link;
 
+  function renderInquireButton(extraClassName = "") {
+    if (!showInquireButton) return null;
+
+    return (
+      <InquireLink
+        href={trimmedInquireHref}
+        className={`header-button${extraClassName ? ` ${extraClassName}` : ""}`}
+        aria-label={trimmedInquireLabel}
+        onClick={() => setIsMenuOpen(false)}
+      >
+        {trimmedInquireLabel}
+      </InquireLink>
+    );
+  }
+
   return (
     <header className={`site-header${isMenuOpen ? " is-menu-open" : ""}`}>
       <div className="site-header__inner">
@@ -107,34 +122,33 @@ export default function SiteHeader({
                 {active && <span className="underline" />}
               </NavLink>
             );
-          })}        </nav>
-
-        <button
-          className={`menu-toggle${isMenuOpen ? " is-open" : ""}`}
-          type="button"
-          aria-expanded={isMenuOpen}
-          aria-controls="site-navigation"
-          onClick={() => setIsMenuOpen((open) => !open)}
-        >
-          <span className="menu-toggle__icon" aria-hidden="true">
-            <span className="menu-toggle__line" />
-            <span className="menu-toggle__line" />
-            <span className="menu-toggle__line" />
-          </span>
-          <span className="visually-hidden">Toggle navigation</span>
-        </button>
-
-        <div className="site-header__actions">
+          })}
           {showInquireButton ? (
-            <InquireLink
-              href={trimmedInquireHref}
-              className="header-button"
-              aria-label={trimmedInquireLabel}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {trimmedInquireLabel}
-            </InquireLink>
+            <div className="site-nav__cta">{renderInquireButton("header-button--menu")}</div>
           ) : null}
+        </nav>
+
+        <div className="site-header__end">
+          {showInquireButton ? (
+            <div className="site-header__actions site-header__actions--bar">
+              {renderInquireButton("header-button--bar")}
+            </div>
+          ) : null}
+
+          <button
+            className={`menu-toggle${isMenuOpen ? " is-open" : ""}`}
+            type="button"
+            aria-expanded={isMenuOpen}
+            aria-controls="site-navigation"
+            onClick={() => setIsMenuOpen((open) => !open)}
+          >
+            <span className="menu-toggle__icon" aria-hidden="true">
+              <span className="menu-toggle__line" />
+              <span className="menu-toggle__line" />
+              <span className="menu-toggle__line" />
+            </span>
+            <span className="visually-hidden">Toggle navigation</span>
+          </button>
         </div>
 
         {isMenuOpen ? (

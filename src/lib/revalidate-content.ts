@@ -1,9 +1,10 @@
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { cacheTags } from "@/lib/cache-tags";
 import type { PageSection } from "@/types/section";
 
 export function revalidateSiteGlobal() {
   revalidateTag(cacheTags.siteGlobal, "max");
+  revalidatePath("/", "layout");
 }
 
 export function revalidatePage(slug: string, sections?: PageSection[]) {

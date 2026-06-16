@@ -10,9 +10,16 @@ export const defaultNavItems = [
 ];
 
 export const defaultHeaderMeta = {
-  inquireLabel: "Inquire",
+  inquireLabel: "Talk to an Expert",
   inquireHref: "/contact",
 };
+
+export function resolveHeaderMeta(source?: Partial<typeof defaultHeaderMeta> | null) {
+  return {
+    inquireLabel: source?.inquireLabel?.trim() || defaultHeaderMeta.inquireLabel,
+    inquireHref: source?.inquireHref?.trim() || defaultHeaderMeta.inquireHref,
+  };
+}
 
 export type FooterLink = { label: string; href: string };
 export type FooterMetaLink = { label: string; href: string; icon?: string };

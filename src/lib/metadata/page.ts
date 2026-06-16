@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getSiteGlobalCached } from "@/lib/content/site-global";
 import { resolvePageForRequest } from "@/lib/content/pages";
+import { resolveMetadataTitle } from "@/lib/metadata/title";
 
 type SeoDefaults = { defaultTitle?: string; defaultDescription?: string };
 
@@ -10,8 +11,10 @@ export async function buildPageMetadata(slug: string): Promise<Metadata> {
     return { title: "Not found" };
   }
   const d = (global?.seoDefaults as SeoDefaults | undefined) ?? {};
+  const siteDefaultTitle = d.defaultTitle?.trim() || "Adam Technology L.L.C.";
+
   return {
-    title: page.seoTitle || d.defaultTitle || page.title,
+    title: resolveMetadataTitle(page.seoTitle, page.title, siteDefaultTitle),
     description: page.seoDescription || d.defaultDescription,
     alternates: page.canonicalPath
       ? { canonical: page.canonicalPath }

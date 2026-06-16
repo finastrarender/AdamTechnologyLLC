@@ -31,6 +31,7 @@ export const heroDataSchema = z
     primaryAction: z.object({ label: z.string(), href: z.string() }),
     secondaryAction: z.object({ label: z.string(), href: z.string() }),
     visualImage: z.string().optional(),
+    visualImageAlt: z.string().optional(),
     backgroundImage: z.string().optional(),
   })
   .transform((data) => ({
@@ -41,6 +42,9 @@ export const heroDataSchema = z
     primaryAction: data.primaryAction,
     secondaryAction: data.secondaryAction,
     visualImage: data.visualImage?.trim() || "/home/hero-visual.png",
+    visualImageAlt:
+      data.visualImageAlt?.trim() ||
+      "Robotic hand holding a digital globe representing enterprise technology and cybersecurity solutions",
   }));
 
 export const introDataSchema = z.object({

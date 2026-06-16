@@ -10,6 +10,7 @@ import {
   defaultFooterCompanyColumn,
   defaultFooterServicesColumn,
   defaultHeaderMeta,
+  resolveHeaderMeta,
   type FooterLinkColumn,
 } from "@/data/site-defaults";
 
@@ -130,8 +131,12 @@ export default function SiteGlobalEditClient() {
         setNavItems(d.navItems ?? []);
         setPages((pagesJson.data ?? []) as PageSummary[]);
         setLogoSrc(d.logoSrc ?? "");
-        setInquireLabel(d.headerMeta?.inquireLabel ?? defaultHeaderMeta.inquireLabel);
-        setInquireHref(d.headerMeta?.inquireHref ?? defaultHeaderMeta.inquireHref);
+        setInquireLabel(
+          resolveHeaderMeta(d.headerMeta as Partial<typeof defaultHeaderMeta> | undefined).inquireLabel,
+        );
+        setInquireHref(
+          resolveHeaderMeta(d.headerMeta as Partial<typeof defaultHeaderMeta> | undefined).inquireHref,
+        );
         setFooterColumns(normalizeLoadedFooterColumns((d.footerColumns ?? []) as FooterColumn[]));
         setBrand(d.footerMeta?.brand ?? defaultFooterMeta.brand);
         setDescription(d.footerMeta?.description ?? defaultFooterMeta.description);
@@ -291,6 +296,11 @@ export default function SiteGlobalEditClient() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json?.error?.message ?? "Save failed");
+      const savedHeader = json.data?.headerMeta as Partial<typeof defaultHeaderMeta> | undefined;
+      if (savedHeader) {
+        setInquireLabel(savedHeader.inquireLabel ?? defaultHeaderMeta.inquireLabel);
+        setInquireHref(savedHeader.inquireHref ?? defaultHeaderMeta.inquireHref);
+      }
       setMessage("Saved.");
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Save error");

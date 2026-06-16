@@ -16,6 +16,7 @@ type HeroFormValues = {
   secondaryLabel: string;
   secondaryHref: string;
   visualImage: string;
+  visualImageAlt: string;
 };
 
 type HeroSectionFormProps = {
@@ -34,6 +35,8 @@ function toDefaultValues(data: Record<string, unknown>): HeroFormValues {
   const secondary = (data.secondaryAction as Record<string, unknown>) ?? {};
   const visualImage =
     (data.visualImage as string)?.trim() || HERO_SECTION_DEFAULT.visualImage;
+  const visualImageAlt =
+    (data.visualImageAlt as string)?.trim() || HERO_SECTION_DEFAULT.visualImageAlt;
   const highlights = Array.isArray(data.highlights)
     ? (data.highlights as string[])
     : HERO_SECTION_DEFAULT.highlights;
@@ -52,6 +55,7 @@ function toDefaultValues(data: Record<string, unknown>): HeroFormValues {
     secondaryHref:
       (secondary.href as string)?.trim() || HERO_SECTION_DEFAULT.secondaryAction.href,
     visualImage,
+    visualImageAlt,
   };
 }
 
@@ -99,6 +103,7 @@ export default function HeroSectionForm({
         href: values.secondaryHref,
       },
       visualImage: values.visualImage,
+      visualImageAlt: values.visualImageAlt.trim(),
     };
 
     onSave(payload);
@@ -219,6 +224,13 @@ export default function HeroSectionForm({
         folder={`sections/${section.type}`}
         placeholder="/home/hero-visual.png"
       />
+      <label>
+        Image alt text
+        <input
+          {...register("visualImageAlt", { required: "Alt text is required for accessibility" })}
+          placeholder={HERO_SECTION_DEFAULT.visualImageAlt}
+        />
+      </label>
       <p className="admin-muted" style={{ marginTop: "0.35rem" }}>
         Robotic hand and digital globe shown on the right side of the hero.
       </p>

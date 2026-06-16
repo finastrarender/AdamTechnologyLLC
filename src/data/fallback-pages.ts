@@ -430,7 +430,7 @@ const FALLBACK_BY_SLUG: Record<string, PublicPageView> = {
     slug: "about",
     title: "About Us",
     status: "published",
-    seoTitle: "About Us | Adam Technology L.L.C.",
+    seoTitle: "About Us",
     seoDescription:
       "Learn about Adam Technology L.L.C. and our security-first approach to building and operating modern digital infrastructure.",
     effectiveSections: sections("about", [
@@ -445,7 +445,7 @@ const FALLBACK_BY_SLUG: Record<string, PublicPageView> = {
     slug: "services",
     title: "Services",
     status: "published",
-    seoTitle: "Services | Adam Technology L.L.C.",
+    seoTitle: "Services",
     seoDescription: "Explore our cybersecurity, cloud & data, and software engineering services.",
     effectiveSections: sections("services", [
       { type: "servicesHero", order: 0, data: SERVICES_HERO_SECTION_DEFAULT },
@@ -457,7 +457,7 @@ const FALLBACK_BY_SLUG: Record<string, PublicPageView> = {
     slug: "contact",
     title: "Contact",
     status: "published",
-    seoTitle: "Contact | Adam Technology L.L.C.",
+    seoTitle: "Contact",
     seoDescription: "Contact Adam Technology L.L.C. for secure, enterprise-grade cybersecurity and infrastructure support.",
     effectiveSections: sections("contact", [
       { type: "contactInquiry", order: 0, data: CONTACT_INQUIRY_SECTION_DEFAULT },
@@ -468,7 +468,7 @@ const FALLBACK_BY_SLUG: Record<string, PublicPageView> = {
     slug: "project",
     title: "Projects",
     status: "published",
-    seoTitle: "Projects | Adam Technology L.L.C.",
+    seoTitle: "Projects",
     seoDescription:
       "Explore Adam Technology case studies in cybersecurity, cloud infrastructure, and blockchain solutions for global enterprises.",
     effectiveSections: sections("project", [
@@ -482,7 +482,7 @@ const FALLBACK_BY_SLUG: Record<string, PublicPageView> = {
     slug: "terms",
     title: "Terms & Conditions",
     status: "published",
-    seoTitle: "Terms & Conditions | Adam Technology L.L.C.",
+    seoTitle: "Terms & Conditions",
     seoDescription:
       "Read the Terms of Use governing access to and use of the Adam Technology website.",
     effectiveSections: sections("terms", [
@@ -495,7 +495,7 @@ const FALLBACK_BY_SLUG: Record<string, PublicPageView> = {
     slug: "privacy",
     title: "Privacy Policy",
     status: "published",
-    seoTitle: "Privacy Policy | Adam Technology L.L.C.",
+    seoTitle: "Privacy Policy",
     seoDescription:
       "Read how Adam Technology collects, uses, and protects personal data across our website and services.",
     effectiveSections: sections("privacy", [

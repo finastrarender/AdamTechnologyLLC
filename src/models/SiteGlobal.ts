@@ -7,13 +7,7 @@ const siteGlobalSchema = new Schema(
     footerColumns: { type: Schema.Types.Mixed, required: true },
     footerMeta: { type: Schema.Types.Mixed, required: true },
     logoSrc: { type: String },
-    headerMeta: {
-      type: {
-        inquireLabel: String,
-        inquireHref: String,
-      },
-      required: false,
-    },
+    headerMeta: { type: Schema.Types.Mixed, required: false },
     featureFlags: { type: Schema.Types.Mixed, default: {} },
     seoDefaults: {
       type: {
@@ -24,14 +18,20 @@ const siteGlobalSchema = new Schema(
     },
     applyNowModal: { type: Schema.Types.Mixed, required: false },
   },
-  { timestamps: true },
+  { timestamps: true, strict: true },
 );
 
 export type SiteGlobalDoc = InferSchemaType<typeof siteGlobalSchema> & {
   _id: mongoose.Types.ObjectId;
 };
 
-const SiteGlobal: Model<SiteGlobalDoc> =
-  mongoose.models.SiteGlobal ?? mongoose.model<SiteGlobalDoc>("SiteGlobal", siteGlobalSchema);
+if (mongoose.models.SiteGlobal) {
+  delete mongoose.models.SiteGlobal;
+}
+
+const SiteGlobal: Model<SiteGlobalDoc> = mongoose.model<SiteGlobalDoc>(
+  "SiteGlobal",
+  siteGlobalSchema,
+);
 
 export default SiteGlobal;
