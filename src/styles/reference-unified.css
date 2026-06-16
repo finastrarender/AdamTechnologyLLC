@@ -15,11 +15,41 @@ p {
   text-wrap: pretty;
 }
 
+:root {
+  --shell-gutter: clamp(16px, 2.5vw, 32px);
+  --shell-width: min(1280px, calc(100vw - 2 * var(--shell-gutter)));
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --shell-width: min(1320px, calc(100vw - 2 * var(--shell-gutter)));
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --shell-width: min(1400px, calc(100vw - 2 * var(--shell-gutter)));
+  }
+}
+
+@media (min-width: 1680px) {
+  :root {
+    --shell-width: min(1480px, calc(100vw - 2 * var(--shell-gutter)));
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --shell-width: min(1560px, calc(100vw - 2 * var(--shell-gutter)));
+  }
+}
+
 .section-shell {
   width: min(100%, var(--shell-width));
   max-width: var(--shell-width);
   margin-inline: auto;
-  padding-inline: clamp(20px, 4vw, 40px);
+  padding-inline: var(--shell-gutter);
+  box-sizing: border-box;
 }
 
 /* Header */
@@ -39,10 +69,12 @@ p {
 
 .site-header__inner {
   width: min(100%, var(--shell-width));
+  max-width: var(--shell-width);
   min-height: var(--header-height);
   margin-inline: auto;
-  padding-inline: clamp(20px, 4vw, 40px);
+  padding-inline: var(--shell-gutter);
   gap: clamp(16px, 2vw, 36px);
+  box-sizing: border-box;
 }
 
 .site-header__left,
@@ -282,7 +314,7 @@ p {
   max-width: var(--shell-width);
   min-height: min(860px, 100vh);
   margin-inline: auto;
-  padding: 96px clamp(20px, 4vw, 40px) clamp(64px, 7vw, 96px);
+  padding: 96px var(--shell-gutter) clamp(64px, 7vw, 96px);
   box-sizing: border-box;
 }
 
@@ -507,7 +539,7 @@ p {
   width: min(100%, var(--shell-width));
   max-width: var(--shell-width);
   margin-inline: auto;
-  padding-inline: clamp(20px, 4vw, 40px);
+  padding-inline: var(--shell-gutter);
 }
 
 .intro-section__copy {
@@ -589,7 +621,7 @@ p {
 .logos-section__card {
   width: min(100%, var(--shell-width));
   max-width: var(--shell-width);
-  padding-inline: clamp(20px, 4vw, 40px);
+  padding-inline: var(--shell-gutter);
 }
 
 .services-section {
@@ -705,7 +737,7 @@ p {
   width: min(100%, var(--shell-width));
   max-width: var(--shell-width);
   margin-inline: auto;
-  padding-inline: clamp(20px, 4vw, 40px);
+  padding-inline: var(--shell-gutter);
 }
 
 .why-section__copy h2,
@@ -799,7 +831,7 @@ p {
   width: min(100%, var(--shell-width));
   max-width: var(--shell-width);
   margin-inline: auto;
-  padding-inline: clamp(20px, 4vw, 40px);
+  padding-inline: var(--shell-gutter);
 }
 
 .cta-section__card {
@@ -874,9 +906,10 @@ p {
   justify-content: center;
   align-items: flex-start;
   width: min(100%, var(--shell-width));
+  max-width: var(--shell-width);
   min-height: clamp(300px, 36vh, 400px);
   margin-inline: auto;
-  padding: clamp(88px, 10vw, 104px) clamp(20px, 4vw, 40px) clamp(48px, 6vw, 72px);
+  padding: clamp(88px, 10vw, 104px) var(--shell-gutter) clamp(48px, 6vw, 72px);
   gap: 10px;
   box-sizing: border-box;
 }
@@ -923,7 +956,7 @@ p {
 
 .services-grid-section__shell {
   width: min(100%, var(--shell-width));
-  padding-inline: clamp(20px, 4vw, 40px);
+  padding-inline: var(--shell-gutter);
 }
 
 .services-grid-card {
@@ -1030,7 +1063,7 @@ p {
 /* About page */
 .about-hero__content {
   width: min(100%, var(--shell-width));
-  padding-inline: clamp(20px, 4vw, 40px);
+  padding-inline: var(--shell-gutter);
   padding-top: clamp(48px, 6vw, 72px);
 }
 
@@ -1057,7 +1090,7 @@ p {
   width: min(100%, var(--shell-width));
   max-width: var(--shell-width);
   margin-inline: auto;
-  padding-inline: clamp(20px, 4vw, 40px);
+  padding-inline: var(--shell-gutter);
 }
 
 .about-panel__title {
@@ -1120,7 +1153,7 @@ p {
   width: min(100%, var(--shell-width));
   max-width: var(--shell-width);
   margin-inline: auto;
-  padding-inline: clamp(20px, 4vw, 40px);
+  padding-inline: var(--shell-gutter);
 }
 
 .contact-inquiry--reference .contact-inquiry__reference-shell {
@@ -1429,7 +1462,7 @@ p {
     width: min(100%, var(--shell-width));
     max-width: var(--shell-width);
     margin-inline: auto;
-    padding-inline: clamp(24px, 3vw, 48px);
+    padding-inline: var(--shell-gutter);
   }
 
   .contact-inquiry__reference-shell {
@@ -1450,11 +1483,12 @@ p {
 
 @media (min-width: 1280px) {
   /* Override legacy styles.css rule that removes shell max-width on large screens */
-  .contact-inquiry--reference .section-shell {
+  .contact-inquiry--reference .section-shell,
+  .contact-inquiry__hero-band .section-shell {
     width: min(100%, var(--shell-width));
     max-width: var(--shell-width);
     margin-inline: auto;
-    padding-inline: clamp(24px, 3vw, 48px);
+    padding-inline: var(--shell-gutter);
   }
 }
 
@@ -1868,7 +1902,10 @@ p {
 .projects-capabilities .section-shell,
 .projects-portfolio__shell {
   width: min(100%, var(--shell-width));
-  padding-inline: clamp(20px, 4vw, 40px);
+  max-width: var(--shell-width);
+  margin-inline: auto;
+  padding-inline: var(--shell-gutter);
+  box-sizing: border-box;
 }
 
 .projects-hero__content {
@@ -1947,7 +1984,7 @@ p {
 .site-footer .section-shell {
   width: min(100%, var(--shell-width));
   max-width: var(--shell-width);
-  padding-inline: clamp(20px, 4vw, 40px);
+  padding-inline: var(--shell-gutter);
 }
 
 .site-footer__brand {
@@ -2065,7 +2102,7 @@ p {
     grid-template-columns: 1fr;
     gap: 28px;
     min-height: auto;
-    padding: 96px clamp(20px, 4vw, 40px) 64px;
+    padding: 96px var(--shell-gutter) 64px;
   }
 
   .hero-section__copy {
@@ -2212,7 +2249,7 @@ p {
   }
 
   .projects-hero__content {
-    padding: clamp(88px, 12vw, 112px) clamp(20px, 4vw, 40px) clamp(48px, 6vw, 64px);
+    padding: clamp(88px, 12vw, 112px) var(--shell-gutter) clamp(48px, 6vw, 64px);
   }
 
   .projects-hero__title {
@@ -2274,7 +2311,7 @@ p {
   }
 
   .contact-inquiry--reference .section-shell {
-    padding-inline: clamp(16px, 4vw, 24px);
+    padding-inline: var(--shell-gutter);
   }
 
   .contact-inquiry--reference .contact-inquiry__reference-shell {
@@ -2448,7 +2485,7 @@ p {
   }
 
   .services-grid-section__shell {
-    padding-inline: clamp(16px, 4vw, 24px);
+    padding-inline: var(--shell-gutter);
   }
 
   .services-grid-card {
@@ -2533,7 +2570,7 @@ p {
   }
 
   .contact-inquiry--reference .section-shell {
-    padding-inline: 16px;
+    padding-inline: var(--shell-gutter);
   }
 
   .contact-inquiry--reference .contact-inquiry__reference-shell {
@@ -2554,7 +2591,7 @@ p {
   }
 
   .hero-section__content {
-    padding: 80px 16px 48px;
+    padding: 80px var(--shell-gutter) 48px;
   }
 
   .hero-section__eyebrow {
@@ -2574,11 +2611,11 @@ p {
   .projects-hero__content,
   .projects-capabilities .section-shell,
   .projects-portfolio__shell {
-    padding-inline: 16px;
+    padding-inline: var(--shell-gutter);
   }
 
   .services-hero__content {
-    padding-inline: 16px;
+    padding-inline: var(--shell-gutter);
   }
 
   .about-hero__content {
@@ -2586,8 +2623,25 @@ p {
   }
 
   .projects-hero__content {
-    padding-inline: 16px;
+    padding-inline: var(--shell-gutter);
   }
+}
+
+/* Shared horizontal alignment track for header, sections, and footer */
+.site-header__inner,
+.site-footer .section-shell,
+.section-shell,
+.intro-section__content,
+.hero-section .hero-section__content.section-shell,
+.hero-section__content,
+.services-hero__content,
+.projects-hero__content,
+.legal-hero__shell,
+.legal-document__shell,
+.contact-inquiry--reference .section-shell {
+  max-width: var(--shell-width);
+  margin-inline: auto;
+  box-sizing: border-box;
 }
 
 /* Terms, Privacy & legal pages */
@@ -2605,7 +2659,7 @@ p {
   width: min(100%, var(--shell-width));
   max-width: var(--shell-width);
   margin-inline: auto;
-  padding: clamp(40px, 5vw, 56px) clamp(16px, 3vw, 32px);
+  padding: clamp(40px, 5vw, 56px) var(--shell-gutter);
   text-align: center;
 }
 
@@ -2627,7 +2681,7 @@ p {
   width: min(100%, var(--shell-width));
   max-width: var(--shell-width);
   margin-inline: auto;
-  padding-inline: clamp(16px, 3vw, 32px);
+  padding-inline: var(--shell-gutter);
 }
 
 .legal-document__section + .legal-document__section {
@@ -2680,6 +2734,6 @@ p {
   }
 
   .legal-document__shell {
-    padding-inline: clamp(24px, 3.5vw, 40px);
+    padding-inline: var(--shell-gutter);
   }
 }
